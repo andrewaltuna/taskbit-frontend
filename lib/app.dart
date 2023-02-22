@@ -18,10 +18,12 @@ class App extends StatelessWidget {
     final selectedTask = state.selectedTask;
     final selectedPage = state.selectedPage;
     return [
-      selectedPage < 0 ? LoginPage.page() : HomePage.page(tasks: state.tasks),
-      if (selectedPage == -2) SignupPage.page(),
-      if (selectedPage == 1) ProfilePage.page(),
-      if (selectedPage == 3) TaskCreatePage.page(),
+      selectedPage == Pages.login || selectedPage == Pages.signUp
+          ? LoginPage.page()
+          : HomePage.page(tasks: state.tasks),
+      if (selectedPage == Pages.signUp) SignupPage.page(),
+      if (selectedPage == Pages.profile) ProfilePage.page(),
+      if (selectedPage == Pages.taskCreate) TaskCreatePage.page(),
       if (selectedTask != null) TaskDetailPage.page(task: state.selectedTask!),
     ];
   }
@@ -36,7 +38,7 @@ class App extends StatelessWidget {
         appBarTheme: const AppBarTheme(color: Color.fromRGBO(197, 84, 84, 1.0)),
       ),
       home: Scaffold(
-        appBar: tasksCubit.state.selectedPage < 0 // selectedPage is LoginPage
+        appBar: tasksCubit.pageIsAuth() // selectedPage is LoginPage
             ? null
             : AppBar(
                 title: const Logo(),
@@ -48,17 +50,20 @@ class App extends StatelessWidget {
               state: context.watch<TasksCubit>().state,
               onGeneratePages: onGeneratePages),
         ),
-        bottomNavigationBar: tasksCubit.state.selectedPage < 0
+        bottomNavigationBar: tasksCubit.pageIsAuth()
             ? null
             : NavigationBar(
                 onDestinationSelected: (int index) {
-                  // if (index == 0)
-                  tasksCubit.pageChanged(index);
+                  Pages page;
+                  if (index == 0) {
+                    page = Pages.home;
+                  } else {
+                    page = Pages.profile;
+                  }
+                  tasksCubit.pageChanged(page);
                 },
-                selectedIndex: tasksCubit.state.selectedPage == 0 ||
-                        tasksCubit.state.selectedPage == 1
-                    ? tasksCubit.state.selectedPage
-                    : 0,
+                selectedIndex:
+                    tasksCubit.getPageNavIndex(tasksCubit.state.selectedPage),
                 destinations: const [
                   NavigationDestination(
                     icon: Icon(Icons.home),

@@ -22,7 +22,7 @@ class TaskCreatePage extends StatelessWidget with DateFormatter {
         return WillPopScope(
           onWillPop: () async {
             taskCreateCubit.resetState();
-            tasksCubit.pageChanged(0);
+            tasksCubit.pageChanged(Pages.home);
             return true;
           },
           child: Padding(
@@ -98,7 +98,7 @@ class TaskCreatePage extends StatelessWidget with DateFormatter {
             ? null
             : () {
                 taskCreateCubit.resetState();
-                tasksCubit.pageChanged(0);
+                tasksCubit.pageChanged(Pages.home);
               },
         child: const Text('Create'),
       ),

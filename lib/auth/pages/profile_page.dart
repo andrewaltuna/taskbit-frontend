@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
     TasksCubit tasksCubit = context.read<TasksCubit>();
     return WillPopScope(
       onWillPop: () async {
-        tasksCubit.pageChanged(0);
+        tasksCubit.pageChanged(Pages.home);
         return true;
       },
       child: Padding(

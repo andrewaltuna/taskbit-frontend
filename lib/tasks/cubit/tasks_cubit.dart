@@ -8,6 +8,18 @@ part 'tasks_state.dart';
 class TasksCubit extends Cubit<TasksState> {
   TasksCubit() : super(const TasksState());
 
+  bool pageIsAuth() {
+    return state.selectedPage == Pages.login ||
+        state.selectedPage == Pages.signUp;
+  }
+
+  int getPageNavIndex(Pages page) {
+    if (page == Pages.profile) {
+      return 1;
+    }
+    return 0;
+  }
+
   void taskSelected(Task task) {
     emit(state.copyWith(selectedTask: () => task));
   }
@@ -25,14 +37,14 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(tasks: tasks));
   }
 
-  void pageChanged(int index) {
+  void pageChanged(Pages page) {
     // emit(state.copyWith(selectedPage: () => index));
-    emit(state.copyWith(selectedPage: index));
+    emit(state.copyWith(selectedPage: page));
   }
 
   void logout() {
     // emit(state.copyWith(selectedPage: () => null));
-    emit(state.copyWith(selectedPage: -1));
+    emit(state.copyWith(selectedPage: Pages.login));
   }
 
   List<Task> ongoingTasks() {

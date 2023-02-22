@@ -70,9 +70,9 @@ class SignupCubit extends Cubit<SignupState> {
   // }
 
   Future<void> createUser() async {
-    HttpLink url = HttpLink('localhost:8000/graphql');
+    HttpLink link = HttpLink('localhost:8000/graphql');
     GraphQLClient gqlClient = GraphQLClient(
-      link: url,
+      link: link,
       cache: GraphQLCache(
         store: HiveStore(),
       ),
@@ -80,6 +80,7 @@ class SignupCubit extends Cubit<SignupState> {
 
     await gqlClient.mutate(
       MutationOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
         document: gql(
           r"""
             mutation {

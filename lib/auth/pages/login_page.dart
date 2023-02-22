@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                 children: [
                   const Text('No account yet?'),
                   TextButton(
-                    onPressed: () => tasksCubit.pageChanged(-2),
+                    onPressed: () => tasksCubit.pageChanged(Pages.signUp),
                     child: const Text('Sign Up'),
                   ),
                 ],
@@ -77,7 +77,7 @@ class LoginPage extends StatelessWidget {
         onPressed: !loginCubit.formIsValid()
             ? null
             : () {
-                tasksCubit.pageChanged(0);
+                tasksCubit.pageChanged(Pages.home);
               },
         child: const Text('Login'),
       ),

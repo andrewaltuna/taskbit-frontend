@@ -22,7 +22,7 @@ class SignupPage extends StatelessWidget {
       builder: (context, state) {
         return WillPopScope(
           onWillPop: () async {
-            tasksCubit.pageChanged(-1);
+            tasksCubit.pageChanged(Pages.login);
             signupCubit.resetState();
             return true;
           },
@@ -121,7 +121,7 @@ class SignupPage extends StatelessWidget {
             ? null
             : () {
                 signupCubit.createUser();
-                tasksCubit.pageChanged(0);
+                tasksCubit.pageChanged(Pages.home);
               },
         child: const Text('Sign Up'),
       ),

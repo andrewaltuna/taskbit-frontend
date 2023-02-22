@@ -17,18 +17,19 @@ class TasksState extends Equatable {
       ),
     ],
     this.selectedTask,
-    this.selectedPage = -1,
+    this.selectedPage = Pages.login,
   });
 
   final List<Task> tasks;
   final Task? selectedTask;
-  final int selectedPage;
+  // final int selectedPage;
+  final Pages selectedPage;
 
   TasksState copyWith({
     List<Task>? tasks,
     ValueGetter<Task?>? selectedTask,
     // ValueGetter<int?>? selectedPage,
-    int? selectedPage,
+    Pages? selectedPage,
   }) {
     return TasksState(
       tasks: tasks ?? this.tasks,

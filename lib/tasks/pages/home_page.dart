@@ -59,7 +59,7 @@ class HomePage extends StatelessWidget {
       height: 25.0,
       child: ElevatedButton(
         onPressed: () {
-          context.read<TasksCubit>().pageChanged(3);
+          context.read<TasksCubit>().pageChanged(Pages.taskCreate);
         },
         child: const Text(
           'Create +',
