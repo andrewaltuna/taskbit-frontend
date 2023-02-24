@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/constants.dart';
+import '../../gql_strings.dart' as gqlstrings;
 
 part 'signup_state.dart';
 
@@ -65,12 +67,12 @@ class SignupCubit extends Cubit<SignupState> {
     emit(SignupState());
   }
 
-  // Future<void> onUserCreated() async {
-
+  // Future<void> onUserRegistered() async {
+  //   if ()
   // }
 
-  Future<void> createUser() async {
-    HttpLink link = HttpLink('localhost:8000/graphql');
+  Future<bool> registerUser() async {
+    HttpLink link = HttpLink(graphQlLink);
     GraphQLClient gqlClient = GraphQLClient(
       link: link,
       cache: GraphQLCache(
@@ -78,32 +80,35 @@ class SignupCubit extends Cubit<SignupState> {
       ),
     );
 
-    await gqlClient.mutate(
+    QueryResult result = await gqlClient.mutate(
       MutationOptions(
         fetchPolicy: FetchPolicy.networkOnly,
         document: gql(
-          r"""
-            mutation {
-              signUp (signUpDetails: {
-                username
-                first_name
-                last_name
-                password
-                avatar
-              })
-            }
-          """,
+          gqlstrings.createUserMutation,
         ),
         variables: {
           'username': state.username,
           'first_name': state.firstName,
           'last_name': state.lastName,
           'password': state.password,
-          'avatar': state.avatars[state.selectedAvatarIndex!].substring(9),
+          'avatar': state.avatars[state.selectedAvatarIndex!].substring(8),
         },
       ),
     );
 
-    resetState();
+    print(result);
+    print(result.hasException);
+
+    if (!result.hasException) {
+      resetState();
+      return true;
+    }
+
+    emit(state.copyWith(
+      usernameInputStatus: InputStatus.invalid,
+      password: '',
+      passwordInputStatus: InputStatus.initial,
+    ));
+    return false;
   }
 }

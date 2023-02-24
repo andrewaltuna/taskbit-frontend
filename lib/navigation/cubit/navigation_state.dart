@@ -1,24 +1,22 @@
 part of 'navigation_cubit.dart';
 
+enum Pages { login, signUp, home, taskCreate, taskDetail, profile }
+
 class NavigationState extends Equatable {
   const NavigationState({
-    this.selectedPage = 0,
-    this.selectedTask,
+    this.selectedPage = Pages.login,
   });
 
-  final int selectedPage;
-  final Task? selectedTask;
+  final Pages selectedPage;
 
   NavigationState copyWith({
-    int? selectedPage,
-    ValueGetter<Task?>? selectedTask,
+    Pages? selectedPage,
   }) {
     return NavigationState(
       selectedPage: selectedPage ?? this.selectedPage,
-      selectedTask: selectedTask != null ? selectedTask() : this.selectedTask,
     );
   }
 
   @override
-  List<Object?> get props => [selectedPage, selectedTask];
+  List<Object?> get props => [selectedPage];
 }

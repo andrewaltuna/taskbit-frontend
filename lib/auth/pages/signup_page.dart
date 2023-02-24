@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/auth/cubit/signup_cubit.dart';
+import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/logo.dart';
 import 'package:taskbit/widgets/sprite.dart';
@@ -17,54 +18,64 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SignupCubit signupCubit = context.read<SignupCubit>();
-    TasksCubit tasksCubit = context.read<TasksCubit>();
+    NavigationCubit navigationCubit = context.read<NavigationCubit>();
+    return WillPopScope(
+      onWillPop: () async {
+        navigationCubit.pageChanged(Pages.login);
+        signupCubit.resetState();
+        return true;
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: _SignupForm(
+            signupCubit: signupCubit, navigationCubit: navigationCubit),
+      ),
+    );
+  }
+}
+
+class _SignupForm extends StatelessWidget {
+  const _SignupForm({
+    required this.signupCubit,
+    required this.navigationCubit,
+  });
+
+  final SignupCubit signupCubit;
+  final NavigationCubit navigationCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController passwordController = TextEditingController();
+
     return BlocBuilder<SignupCubit, SignupState>(
       builder: (context, state) {
-        return WillPopScope(
-          onWillPop: () async {
-            tasksCubit.pageChanged(Pages.login);
-            signupCubit.resetState();
-            return true;
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Logo(),
+              const SizedBox(height: 20.0),
+              const _AvatarSelect(),
+              Row(
                 children: [
-                  const Logo(),
-                  // const Text(
-                  //   'Sign Up',
-                  //   style: TextStyle(
-                  //     fontSize: 25,
-                  //     fontWeight: FontWeight.w700,
-                  //   ),
-                  // ),
-                  const SizedBox(height: 20.0),
-                  const _AvatarSelect(),
-                  // const SizedBox(height: 30.0),
-                  Row(
-                    children: [
-                      Expanded(child: _firstNameField(signupCubit)),
-                      const SizedBox(width: 15.0),
-                      Expanded(child: _lastNameField(signupCubit)),
-                    ],
-                  ),
-                  _usernameField(signupCubit),
-                  _passwordField(signupCubit),
-                  const SizedBox(height: 30.0),
-                  _submitButton(signupCubit, tasksCubit),
+                  Expanded(child: _firstNameField()),
+                  const SizedBox(width: 15.0),
+                  Expanded(child: _lastNameField()),
                 ],
               ),
-            ),
+              _usernameField(),
+              _passwordField(passwordController),
+              const SizedBox(height: 30.0),
+              _submitButton(context, passwordController),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _firstNameField(SignupCubit signupCubit) {
+  Widget _firstNameField() {
     return TextField(
       onChanged: signupCubit.firstNameChanged,
       decoration: InputDecoration(
@@ -76,7 +87,7 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _lastNameField(SignupCubit signupCubit) {
+  Widget _lastNameField() {
     return TextField(
       onChanged: signupCubit.lastNameChanged,
       decoration: InputDecoration(
@@ -88,7 +99,7 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _usernameField(SignupCubit signupCubit) {
+  Widget _usernameField() {
     return TextField(
       onChanged: signupCubit.usernameChanged,
       decoration: InputDecoration(
@@ -100,8 +111,9 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _passwordField(SignupCubit signupCubit) {
+  Widget _passwordField(TextEditingController passwordController) {
     return TextField(
+      controller: passwordController,
       onChanged: signupCubit.passwordChanged,
       obscureText: true,
       decoration: InputDecoration(
@@ -113,19 +125,30 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  Widget _submitButton(SignupCubit signupCubit, TasksCubit tasksCubit) {
+  Widget _submitButton(
+      BuildContext context, TextEditingController passwordController) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: !signupCubit.formIsValid()
             ? null
-            : () {
-                signupCubit.createUser();
-                tasksCubit.pageChanged(Pages.home);
+            : () async {
+                if (await signupCubit.registerUser() == true) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(successSnackBar());
+                  }
+                  return navigationCubit.pageChanged(Pages.login);
+                }
+                passwordController.clear();
               },
         child: const Text('Sign Up'),
       ),
     );
+  }
+
+  SnackBar successSnackBar() {
+    return const SnackBar(content: Text('Successfuly registered!'));
   }
 }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/auth/models/user.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/sprite.dart';
@@ -15,9 +17,12 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TasksCubit tasksCubit = context.read<TasksCubit>();
+    NavigationCubit navigationCubit = context.read<NavigationCubit>();
+    LoginCubit loginCubit = context.read<LoginCubit>();
+
     return WillPopScope(
       onWillPop: () async {
-        tasksCubit.pageChanged(Pages.home);
+        navigationCubit.pageChanged(Pages.home);
         return true;
       },
       child: Padding(
@@ -33,7 +38,9 @@ class ProfilePage extends StatelessWidget {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    tasksCubit.logout();
+                    loginCubit.resetState();
+                    tasksCubit.resetState();
+                    navigationCubit.pageChanged(Pages.login);
                   },
                   child: const Text('Logout'),
                 ),
@@ -51,6 +58,8 @@ class _PlayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LoginCubit loginCubit = context.read<LoginCubit>();
+    User user = loginCubit.state.user!;
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -62,10 +71,10 @@ class _PlayerCard extends StatelessWidget {
               child: Row(
                 children: [
                   // Player avatar
-                  _playerAvatar(),
+                  _playerAvatar(user.avatar),
                   // Player stats
                   Expanded(
-                    child: _playerStats(),
+                    child: _playerStats(user.username),
                   ),
                 ],
               ),
@@ -76,7 +85,7 @@ class _PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _playerAvatar() {
+  Widget _playerAvatar(String sprite) {
     return Container(
       height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -86,11 +95,11 @@ class _PlayerCard extends StatelessWidget {
           image: AssetImage('assets/images/profile_background.png'),
         ),
       ),
-      child: const Sprite('avatars/knight', height: 70),
+      child: Sprite('avatars/$sprite', height: 70),
     );
   }
 
-  Widget _playerStats() {
+  Widget _playerStats(String username) {
     return Container(
       padding: const EdgeInsets.all(10.0),
       decoration: const BoxDecoration(
@@ -103,17 +112,17 @@ class _PlayerCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10.0),
         color: Colors.black.withOpacity(0.5),
-        child: _cardText(),
+        child: _cardText(username),
       ),
     );
   }
 
-  Widget _cardText() {
+  Widget _cardText(String username) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Player 1',
+          username,
           style: GoogleFonts.pressStart2p(color: Colors.white),
         ),
         const Divider(thickness: 3.0),

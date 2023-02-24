@@ -1,24 +1,16 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:taskbit/constants.dart';
+import 'package:taskbit/tasks/models/stage.dart';
 import 'package:taskbit/tasks/models/task.dart';
+import '../../gql_strings.dart' as gqlstrings;
 
 part 'tasks_state.dart';
 
 class TasksCubit extends Cubit<TasksState> {
   TasksCubit() : super(const TasksState());
-
-  bool pageIsAuth() {
-    return state.selectedPage == Pages.login ||
-        state.selectedPage == Pages.signUp;
-  }
-
-  int getPageNavIndex(Pages page) {
-    if (page == Pages.profile) {
-      return 1;
-    }
-    return 0;
-  }
 
   void taskSelected(Task task) {
     emit(state.copyWith(selectedTask: () => task));
@@ -28,23 +20,8 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(selectedTask: () => null));
   }
 
-  void taskCompleted(Task task) {
-    List<Task> tasks = [...state.tasks];
-    int index = tasks.indexOf(task);
-    tasks[index] = tasks[index].copyWith(
-      dateCompleted: () => TimeOfDay.now().toString(),
-    );
-    emit(state.copyWith(tasks: tasks));
-  }
-
-  void pageChanged(Pages page) {
-    // emit(state.copyWith(selectedPage: () => index));
-    emit(state.copyWith(selectedPage: page));
-  }
-
-  void logout() {
-    // emit(state.copyWith(selectedPage: () => null));
-    emit(state.copyWith(selectedPage: Pages.login));
+  void resetState() {
+    emit(const TasksState());
   }
 
   List<Task> ongoingTasks() {
@@ -53,5 +30,82 @@ class TasksCubit extends Cubit<TasksState> {
 
   List<Task> completedTasks() {
     return state.tasks.where((task) => task.dateCompleted != null).toList();
+  }
+
+  // GRAPHQL CALLS
+
+  Future<bool> fetchTasksEnemyData({required String authToken}) async {
+    final HttpLink link = HttpLink(graphQlLink);
+
+    final AuthLink authLink =
+        AuthLink(getToken: () async => 'Bearer $authToken');
+
+    final authorizedLink = authLink.concat(link);
+
+    final GraphQLClient gqlClient = GraphQLClient(
+      link: authorizedLink,
+      cache: GraphQLCache(
+        store: HiveStore(),
+      ),
+    );
+
+    final QueryResult result = await gqlClient.query(
+      QueryOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gqlstrings.taskEnemyQuery,
+        ),
+      ),
+    );
+
+    var data = result.data!['getTaskEnemy'];
+    List<Task> tasks = [];
+    for (var task in data['tasks']) {
+      tasks.add(Task.fromJson(task));
+    }
+    print(data['tasks']);
+
+    Stage stage = Stage.fromJson(data);
+
+    emit(state.copyWith(tasks: tasks, stage: () => stage));
+
+    if (!result.hasException) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> taskCompleted(
+      {required String authToken, required Task task}) async {
+    final HttpLink link = HttpLink(graphQlLink);
+
+    final AuthLink authLink =
+        AuthLink(getToken: () async => 'Bearer $authToken');
+
+    final authorizedLink = authLink.concat(link);
+
+    final GraphQLClient gqlClient = GraphQLClient(
+      link: authorizedLink,
+      cache: GraphQLCache(
+        store: HiveStore(),
+      ),
+    );
+
+    final QueryResult result = await gqlClient.query(
+      QueryOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gqlstrings.completeTaskMutation,
+        ),
+        variables: {
+          'taskId': task.id.toString(),
+        },
+      ),
+    );
+
+    if (!result.hasException) {
+      return true;
+    }
+    return false;
   }
 }

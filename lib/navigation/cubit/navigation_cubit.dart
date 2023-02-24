@@ -1,22 +1,24 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:taskbit/tasks/models/task.dart';
 
 part 'navigation_state.dart';
 
 class NavigationCubit extends Cubit<NavigationState> {
-  NavigationCubit() : super(NavigationState());
+  NavigationCubit() : super(const NavigationState());
 
-  void pageChanged(int index) {
-    emit(state.copyWith(selectedPage: index));
+  bool pageIsAuth() {
+    return state.selectedPage == Pages.login ||
+        state.selectedPage == Pages.signUp;
   }
 
-  void taskSelected(Task task) {
-    emit(state.copyWith(selectedTask: () => task));
+  int getPageNavIndex(Pages page) {
+    if (page == Pages.profile) {
+      return 1;
+    }
+    return 0;
   }
 
-  void taskDeselected(Task task) {
-    emit(state.copyWith(selectedTask: () => null));
+  void pageChanged(Pages page) {
+    emit(state.copyWith(selectedPage: page));
   }
 }

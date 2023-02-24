@@ -5,6 +5,7 @@ import 'package:taskbit/auth/pages/login_page.dart';
 import 'package:taskbit/auth/pages/profile_page.dart';
 import 'package:taskbit/auth/pages/signup_page.dart';
 import 'package:taskbit/constants.dart';
+import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/tasks/pages/home_page.dart';
 import 'package:taskbit/tasks/pages/task_create_page.dart';
@@ -14,23 +15,23 @@ import 'package:taskbit/widgets/logo.dart';
 class App extends StatelessWidget {
   const App({super.key});
 
-  List<Page> onGeneratePages(TasksState state, List<Page> pages) {
-    final selectedTask = state.selectedTask;
+  List<Page> onGeneratePages(NavigationState state, List<Page> pages) {
+    // final selectedTask = state.selectedTask;
     final selectedPage = state.selectedPage;
     return [
       selectedPage == Pages.login || selectedPage == Pages.signUp
           ? LoginPage.page()
-          : HomePage.page(tasks: state.tasks),
+          : HomePage.page(),
       if (selectedPage == Pages.signUp) SignupPage.page(),
       if (selectedPage == Pages.profile) ProfilePage.page(),
       if (selectedPage == Pages.taskCreate) TaskCreatePage.page(),
-      if (selectedTask != null) TaskDetailPage.page(task: state.selectedTask!),
+      if (selectedPage == Pages.taskDetail) TaskDetailPage.page(),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final tasksCubit = context.read<TasksCubit>();
+    final navigationCubit = context.read<NavigationCubit>();
     return MaterialApp(
       title: appName,
       theme: ThemeData(
@@ -38,7 +39,7 @@ class App extends StatelessWidget {
         appBarTheme: const AppBarTheme(color: Color.fromRGBO(197, 84, 84, 1.0)),
       ),
       home: Scaffold(
-        appBar: tasksCubit.pageIsAuth() // selectedPage is LoginPage
+        appBar: navigationCubit.pageIsAuth() // selectedPage is LoginPage
             ? null
             : AppBar(
                 title: const Logo(),
@@ -47,10 +48,10 @@ class App extends StatelessWidget {
               ),
         body: SafeArea(
           child: FlowBuilder(
-              state: context.watch<TasksCubit>().state,
+              state: context.watch<NavigationCubit>().state,
               onGeneratePages: onGeneratePages),
         ),
-        bottomNavigationBar: tasksCubit.pageIsAuth()
+        bottomNavigationBar: navigationCubit.pageIsAuth()
             ? null
             : NavigationBar(
                 onDestinationSelected: (int index) {
@@ -60,10 +61,10 @@ class App extends StatelessWidget {
                   } else {
                     page = Pages.profile;
                   }
-                  tasksCubit.pageChanged(page);
+                  navigationCubit.pageChanged(page);
                 },
-                selectedIndex:
-                    tasksCubit.getPageNavIndex(tasksCubit.state.selectedPage),
+                selectedIndex: navigationCubit
+                    .getPageNavIndex(navigationCubit.state.selectedPage),
                 destinations: const [
                   NavigationDestination(
                     icon: Icon(Icons.home),

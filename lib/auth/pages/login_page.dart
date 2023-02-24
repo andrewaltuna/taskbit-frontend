@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/logo.dart';
 
@@ -13,39 +14,55 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LoginCubit loginCubit = context.read<LoginCubit>();
-    TasksCubit tasksCubit = context.read<TasksCubit>();
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: _LoginForm(
+        loginCubit: context.read<LoginCubit>(),
+        navigationCubit: context.read<NavigationCubit>(),
+      ),
+    );
+  }
+}
+
+class _LoginForm extends StatelessWidget {
+  const _LoginForm({
+    required this.loginCubit,
+    required this.navigationCubit,
+  });
+
+  final LoginCubit loginCubit;
+  final NavigationCubit navigationCubit;
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Logo(),
-              const SizedBox(height: 30.0),
-              _usernameField(loginCubit),
-              _passwordField(loginCubit),
-              const SizedBox(height: 30.0),
-              _submitButton(loginCubit, tasksCubit),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('No account yet?'),
-                  TextButton(
-                    onPressed: () => tasksCubit.pageChanged(Pages.signUp),
-                    child: const Text('Sign Up'),
-                  ),
-                ],
-              )
-            ],
-          ),
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Logo(),
+            const SizedBox(height: 30.0),
+            _usernameField(),
+            _passwordField(),
+            const SizedBox(height: 30.0),
+            _submitButton(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('No account yet?'),
+                TextButton(
+                  onPressed: () => navigationCubit.pageChanged(Pages.signUp),
+                  child: const Text('Sign Up'),
+                ),
+              ],
+            )
+          ],
         );
       },
     );
   }
 
-  Widget _usernameField(LoginCubit loginCubit) {
+  Widget _usernameField() {
     return TextField(
       onChanged: loginCubit.usernameChanged,
       decoration: InputDecoration(
@@ -57,7 +74,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _passwordField(LoginCubit loginCubit) {
+  Widget _passwordField() {
     return TextField(
       onChanged: loginCubit.passwordChanged,
       obscureText: true,
@@ -70,14 +87,16 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _submitButton(LoginCubit loginCubit, TasksCubit tasksCubit) {
+  Widget _submitButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: !loginCubit.formIsValid()
             ? null
-            : () {
-                tasksCubit.pageChanged(Pages.home);
+            : () async {
+                if (await loginCubit.fetchUser() == true) {
+                  navigationCubit.pageChanged(Pages.home);
+                }
               },
         child: const Text('Login'),
       ),
