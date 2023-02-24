@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
+import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
+import 'package:taskbit/tasks/cubit/task_create_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/tasks/models/task.dart';
 
@@ -131,11 +133,10 @@ class _TaskItem extends StatelessWidget with DateFormatter {
           color: Colors.black.withOpacity(0.04),
           child: InkWell(
             onTap: () {
+              context.read<NavigationCubit>().pageChanged(Pages.taskDetail);
               context.read<TasksCubit>().taskSelected(task);
             },
             child: Padding(
-              // padding: const EdgeInsets.only(
-              //     top: 5.0, bottom: 5.0, left: 15.0, right: 5.0),
               padding:
                   const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
               child: Row(
@@ -146,7 +147,12 @@ class _TaskItem extends StatelessWidget with DateFormatter {
                     // style: TextStyle(),
                   ),
                   task.dateCompleted == null
-                      ? _completeButton(context)
+                      ? Row(
+                          children: [
+                            _completeButton(context),
+                            _popupMenuButton(context),
+                          ],
+                        )
                       : Text(formatDate(task.dateCompleted!)),
                 ],
               ),
@@ -157,8 +163,32 @@ class _TaskItem extends StatelessWidget with DateFormatter {
     );
   }
 
+  Widget _popupMenuButton(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+    final taskCreateCubit = context.read<TaskCreateCubit>();
+    final navigationCubit = context.read<NavigationCubit>();
+    final authToken = context.read<LoginCubit>().state.user!.accessToken;
+    return PopupMenuButton(
+      onSelected: (value) async {
+        if (value == Pages.taskUpdate) {
+          taskCreateCubit.copyDetails(task);
+          navigationCubit.pageChanged(value);
+          return;
+        }
+        await tasksCubit.taskDeleted(authToken: authToken, task: task);
+        tasksCubit.fetchTasksEnemyData(authToken: authToken);
+        return;
+      },
+      itemBuilder: (context) => <PopupMenuEntry>[
+        const PopupMenuItem(value: Pages.taskUpdate, child: Text('Update')),
+        const PopupMenuItem(value: Pages.taskDelete, child: Text('Delete')),
+      ],
+    );
+  }
+
   Widget _completeButton(BuildContext context) {
-    final TasksCubit tasksCubit = context.read<TasksCubit>();
+    final tasksCubit = context.read<TasksCubit>();
+    final authToken = context.read<LoginCubit>().state.user!.accessToken;
     return IconButton(
       icon: const Icon(Icons.check),
       onPressed: () {
@@ -177,15 +207,12 @@ class _TaskItem extends StatelessWidget with DateFormatter {
               ),
               TextButton(
                 onPressed: () async {
-                  String authToken =
-                      context.read<LoginCubit>().state.user!.accessToken;
                   if (await tasksCubit.taskCompleted(
                     authToken: authToken,
                     task: task,
                   )) {
                     tasksCubit.fetchTasksEnemyData(authToken: authToken);
                   }
-
                   if (context.mounted) {}
                   Navigator.of(context).pop();
                 },

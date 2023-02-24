@@ -67,10 +67,6 @@ class SignupCubit extends Cubit<SignupState> {
     emit(SignupState());
   }
 
-  // Future<void> onUserRegistered() async {
-  //   if ()
-  // }
-
   Future<bool> registerUser() async {
     HttpLink link = HttpLink(graphQlLink);
     GraphQLClient gqlClient = GraphQLClient(
@@ -96,19 +92,17 @@ class SignupCubit extends Cubit<SignupState> {
       ),
     );
 
-    print(result);
-    print(result.hasException);
+    final bool success = result.data!['signUp'] ?? false;
 
-    if (!result.hasException) {
+    if (success) {
       resetState();
-      return true;
+    } else {
+      emit(state.copyWith(
+        usernameInputStatus: InputStatus.invalid,
+        password: '',
+        passwordInputStatus: InputStatus.initial,
+      ));
     }
-
-    emit(state.copyWith(
-      usernameInputStatus: InputStatus.invalid,
-      password: '',
-      passwordInputStatus: InputStatus.initial,
-    ));
-    return false;
+    return success;
   }
 }

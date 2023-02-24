@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/constants.dart';
+import 'package:taskbit/tasks/models/task.dart';
 import '../../gql_strings.dart' as gqlstrings;
 
 part 'task_create_state.dart';
@@ -13,6 +14,10 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
 
   bool formIsValid() {
     return state.nameInputStatus == InputStatus.valid;
+  }
+
+  bool isCreate() {
+    return state.id == null;
   }
 
   void nameChanged(String value) {
@@ -31,6 +36,16 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
   void dateDueChanged(DateTime value) {
     emit(state.copyWith(
         dateDue: () => value, dateDueInputStatus: InputStatus.valid));
+  }
+
+  void copyDetails(Task task) {
+    emit(state.copyWith(
+      id: () => task.id,
+      name: task.name,
+      description: () => task.description,
+      dateDue: () => task.dateDue,
+    ));
+    print(task.dateDue);
   }
 
   void resetState() {
@@ -66,10 +81,49 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
       ),
     );
 
-    if (!result.hasException) {
+    final bool success = result.data!['createTask'] ?? false;
+
+    if (success) {
       resetState();
-      return true;
     }
-    return false;
+    return success;
+  }
+
+  Future<bool> updateTask({required String authToken}) async {
+    final HttpLink link = HttpLink(graphQlLink);
+
+    final AuthLink authLink =
+        AuthLink(getToken: () async => 'Bearer $authToken');
+
+    final authorizedLink = authLink.concat(link);
+
+    final GraphQLClient gqlClient = GraphQLClient(
+      link: authorizedLink,
+      cache: GraphQLCache(
+        store: HiveStore(),
+      ),
+    );
+
+    final QueryResult result = await gqlClient.mutate(
+      MutationOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gqlstrings.updateTaskMutation,
+        ),
+        variables: {
+          'taskId': state.id,
+          'name': state.name,
+          'description': state.description,
+          'dateDue': state.dateDue?.toString(),
+        },
+      ),
+    );
+
+    final bool success = result.data!['updateTask'] ?? false;
+
+    if (success) {
+      resetState();
+    }
+    return success;
   }
 }

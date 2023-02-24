@@ -50,6 +50,7 @@ class LoginCubit extends Cubit<LoginState> {
     );
     QueryResult result = await gqlClient.query(
       QueryOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
         document: gql(
           gqlstrings.loginQuery,
         ),

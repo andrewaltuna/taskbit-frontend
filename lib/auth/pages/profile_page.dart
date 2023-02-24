@@ -5,6 +5,8 @@ import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/auth/models/user.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
+import 'package:taskbit/tasks/models/stats.dart';
+import 'package:taskbit/widgets/custom_header.dart';
 import 'package:taskbit/widgets/sprite.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -32,7 +34,7 @@ class ProfilePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20.0),
-              Text('Profile', style: GoogleFonts.pressStart2p()),
+              const CustomHeader('Profile'),
               const SizedBox(height: 10.0),
               const _PlayerCard(),
               Center(
@@ -58,8 +60,9 @@ class _PlayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LoginCubit loginCubit = context.read<LoginCubit>();
-    User user = loginCubit.state.user!;
+    final loginCubit = context.read<LoginCubit>();
+    final user = loginCubit.state.user!;
+    final tasksCubit = context.read<TasksCubit>();
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -74,7 +77,7 @@ class _PlayerCard extends StatelessWidget {
                   _playerAvatar(user.avatar),
                   // Player stats
                   Expanded(
-                    child: _playerStats(user.username),
+                    child: _playerStats(user.username, tasksCubit.state.stats!),
                   ),
                 ],
               ),
@@ -99,7 +102,7 @@ class _PlayerCard extends StatelessWidget {
     );
   }
 
-  Widget _playerStats(String username) {
+  Widget _playerStats(String username, Stats stats) {
     return Container(
       padding: const EdgeInsets.all(10.0),
       decoration: const BoxDecoration(
@@ -112,37 +115,33 @@ class _PlayerCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10.0),
         color: Colors.black.withOpacity(0.5),
-        child: _cardText(username),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              username,
+              style: GoogleFonts.pressStart2p(color: Colors.white),
+            ),
+            const Divider(thickness: 3.0),
+            Text(
+              'Bosses Slain: ${stats.bossesSlain}',
+              style: TextStyle(color: Colors.white),
+            ),
+            Text(
+              'Enemies Slain: ${stats.enemiesSlain}',
+              style: TextStyle(color: Colors.white),
+            ),
+            Text(
+              'Tasks Completed: ${stats.tasksCompleted}',
+              style: TextStyle(color: Colors.white),
+            ),
+            Text(
+              'Stages Completed: ${stats.stagesCompleted}',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _cardText(String username) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          username,
-          style: GoogleFonts.pressStart2p(color: Colors.white),
-        ),
-        const Divider(thickness: 3.0),
-        const Text(
-          'Bosses Slain:',
-          style: TextStyle(color: Colors.white),
-        ),
-        const Text(
-          'Enemies Slain:',
-          style: TextStyle(color: Colors.white),
-        ),
-        const Text(
-          'Tasks Completed:',
-          style: TextStyle(color: Colors.white),
-        ),
-        const Text(
-          'Stages Completed:',
-          style: TextStyle(color: Colors.white),
-        ),
-      ],
     );
   }
 }

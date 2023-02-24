@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/battle_display.dart';
+import 'package:taskbit/widgets/custom_header.dart';
 import 'package:taskbit/widgets/task_display.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -59,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _tasksHeader(),
+                                const CustomHeader('Tasks'),
                                 _createButton(context),
                               ],
                             ),
@@ -74,16 +76,6 @@ class _HomePageState extends State<HomePage> {
                 ),
         );
       },
-    );
-  }
-
-  Widget _tasksHeader() {
-    return const Text(
-      'Tasks',
-      style: TextStyle(
-        fontSize: 25,
-        fontWeight: FontWeight.w700,
-      ),
     );
   }
 

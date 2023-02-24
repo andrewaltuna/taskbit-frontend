@@ -111,11 +111,19 @@ class BattleDisplay extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: LinearProgressIndicator(
-                  value: currentHp / maxHp,
-                  color: Colors.red,
-                  backgroundColor: Colors.white.withOpacity(0.4),
-                  minHeight: 13,
+                child: TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  tween: Tween<double>(
+                    begin: 0,
+                    end: currentHp / maxHp,
+                  ),
+                  builder: (_, value, __) => LinearProgressIndicator(
+                    value: value,
+                    color: Colors.red,
+                    backgroundColor: Colors.white.withOpacity(0.4),
+                    minHeight: 13,
+                  ),
                 ),
               ),
               Text(

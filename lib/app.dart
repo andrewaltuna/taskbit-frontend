@@ -6,7 +6,6 @@ import 'package:taskbit/auth/pages/profile_page.dart';
 import 'package:taskbit/auth/pages/signup_page.dart';
 import 'package:taskbit/constants.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/tasks/pages/home_page.dart';
 import 'package:taskbit/tasks/pages/task_create_page.dart';
 import 'package:taskbit/tasks/pages/task_detail_page.dart';
@@ -24,7 +23,8 @@ class App extends StatelessWidget {
           : HomePage.page(),
       if (selectedPage == Pages.signUp) SignupPage.page(),
       if (selectedPage == Pages.profile) ProfilePage.page(),
-      if (selectedPage == Pages.taskCreate) TaskCreatePage.page(),
+      if (selectedPage == Pages.taskCreate || selectedPage == Pages.taskUpdate)
+        TaskCreatePage.page(),
       if (selectedPage == Pages.taskDetail) TaskDetailPage.page(),
     ];
   }

@@ -53,15 +53,22 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController dateDueController = TextEditingController();
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final dateDueController = TextEditingController();
+    if (!taskCreateCubit.isCreate()) {
+      nameController.text = taskCreateCubit.state.name;
+      descriptionController.text = taskCreateCubit.state.description ?? '';
+      dateDueController.text = formatDate(taskCreateCubit.state.dateDue);
+    }
     return BlocBuilder<TaskCreateCubit, TaskCreateState>(
       builder: (context, state) {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30.0),
-            _nameField(),
-            _descriptionField(),
+            _nameField(nameController),
+            _descriptionField(descriptionController),
             _dateDueField(context, dateDueController),
             const SizedBox(height: 30.0),
             _submitButton(),
@@ -71,8 +78,9 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
     );
   }
 
-  Widget _nameField() {
+  Widget _nameField(TextEditingController controller) {
     return TextField(
+      controller: controller,
       onChanged: taskCreateCubit.nameChanged,
       decoration: InputDecoration(
         label: const Text('Name'),
@@ -83,8 +91,9 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
     );
   }
 
-  Widget _descriptionField() {
+  Widget _descriptionField(TextEditingController controller) {
     return TextField(
+      controller: controller,
       onChanged: taskCreateCubit.descriptionChanged,
       decoration: const InputDecoration(
         label: Text('Description'),
@@ -93,6 +102,7 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
   }
 
   Widget _dateDueField(BuildContext context, TextEditingController controller) {
+    // final taskCreateCubit = context.read<TaskCreateCubit>();
     return TextField(
       onTap: () async {
         DateTime? date = await showDatePicker(
@@ -122,15 +132,27 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
       child: ElevatedButton(
         onPressed: !taskCreateCubit.formIsValid()
             ? null
-            : () async {
-                String authToken = loginCubit.state.user!.accessToken;
-                if (await taskCreateCubit.createTask(authToken: authToken)) {
-                  await tasksCubit.fetchTasksEnemyData(authToken: authToken);
-                  navigationCubit.pageChanged(Pages.home);
-                }
-              },
-        child: const Text('Create'),
+            : taskCreateCubit.isCreate()
+                ? _createFunction
+                : _updateFunction,
+        child: Text(taskCreateCubit.isCreate() ? 'Create' : 'Update'),
       ),
     );
+  }
+
+  void _createFunction() async {
+    String authToken = loginCubit.state.user!.accessToken;
+    if (await taskCreateCubit.createTask(authToken: authToken)) {
+      await tasksCubit.fetchTasksEnemyData(authToken: authToken);
+      navigationCubit.pageChanged(Pages.home);
+    }
+  }
+
+  void _updateFunction() async {
+    String authToken = loginCubit.state.user!.accessToken;
+    if (await taskCreateCubit.updateTask(authToken: authToken)) {
+      await tasksCubit.fetchTasksEnemyData(authToken: authToken);
+      navigationCubit.pageChanged(Pages.home);
+    }
   }
 }

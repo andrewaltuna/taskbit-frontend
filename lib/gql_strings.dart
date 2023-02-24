@@ -6,9 +6,7 @@ const createUserMutation = r"""
                 last_name: $last_name
                 password: $password
                 avatar: $avatar
-              }) {
-                username
-              }
+              })
             }
           """;
 
@@ -43,15 +41,32 @@ const createTaskMutation = r"""
                 name: $name
                 description: $description
                 dateDue: $dateDue
-              }) {
-                name
-              }
+              })
+            }
+          """;
+
+const updateTaskMutation = r"""
+            mutation($taskId: String!, $name: String!, $description: String, $dateDue: String) {
+              updateTask (editTaskDetails: {
+                taskId: $taskId
+                name: $name
+                description: $description
+                dateDue: $dateDue
+              })
             }
           """;
 
 const completeTaskMutation = r"""
             mutation($taskId: String!) {
               completeTask (
+                taskId: $taskId
+              )
+            }
+          """;
+
+const deleteTaskMutation = r"""
+            mutation($taskId: String!) {
+              deleteTask (
                 taskId: $taskId
               )
             }
@@ -78,6 +93,10 @@ const taskEnemyQuery = r"""
               }
               stage
               substage
+              bossesSlain
+              enemiesSlain
+              tasksCompleted
+              stagesCompleted
             }
           }
           """;

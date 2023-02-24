@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:taskbit/auth/models/enemy.dart';
 
 class Stage extends Equatable {
-  late final String stage;
-  late final String substage;
+  late final int stage;
+  late final int substage;
   late final Enemy enemy;
 
   Stage.fromJson(Map<String, dynamic> data) {

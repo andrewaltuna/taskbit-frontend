@@ -2,6 +2,7 @@ part of 'task_create_cubit.dart';
 
 class TaskCreateState extends Equatable {
   const TaskCreateState({
+    this.id,
     this.name = '',
     this.description = '',
     this.dateDue,
@@ -10,6 +11,7 @@ class TaskCreateState extends Equatable {
     this.dateDueInputStatus = InputStatus.initial,
   });
 
+  final String? id;
   final String name;
   final String? description;
   final DateTime? dateDue;
@@ -18,6 +20,7 @@ class TaskCreateState extends Equatable {
   final InputStatus dateDueInputStatus;
 
   TaskCreateState copyWith({
+    ValueGetter<String?>? id,
     String? name,
     ValueGetter<String?>? description,
     ValueGetter<DateTime?>? dateDue,
@@ -26,6 +29,7 @@ class TaskCreateState extends Equatable {
     InputStatus? dateDueInputStatus,
   }) {
     return TaskCreateState(
+      id: id != null ? id() : this.id,
       name: name ?? this.name,
       description: description != null ? description() : this.description,
       dateDue: dateDue != null ? dateDue() : this.dateDue,
@@ -38,6 +42,7 @@ class TaskCreateState extends Equatable {
 
   @override
   List<Object?> get props => [
+        id,
         name,
         description,
         dateDue,
