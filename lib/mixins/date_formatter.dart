@@ -8,4 +8,12 @@ class DateFormatter {
     }
     return '';
   }
+
+  String formatDatePretty(DateTime? date) {
+    if (date != null) {
+      DateFormat dateFormat = DateFormat('MMM dd, yyyy');
+      return dateFormat.format(date);
+    }
+    return '';
+  }
 }

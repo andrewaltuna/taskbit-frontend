@@ -28,27 +28,38 @@ class ProfilePage extends StatelessWidget {
         return true;
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20.0),
-              const CustomHeader('Profile'),
-              const SizedBox(height: 10.0),
-              const _PlayerCard(),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    loginCubit.resetState();
-                    tasksCubit.resetState();
-                    navigationCubit.pageChanged(Pages.login);
-                  },
-                  child: const Text('Logout'),
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            const SizedBox(height: 20.0),
+            const CustomHeader('Profile'),
+            const SizedBox(height: 10.0),
+            const _PlayerCard(),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 211, 76, 66),
+                    ),
+                    onPressed: () {
+                      loginCubit.resetState();
+                      tasksCubit.resetState();
+                      navigationCubit.pageChanged(Pages.login);
+                    },
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -74,10 +85,18 @@ class _PlayerCard extends StatelessWidget {
               child: Row(
                 children: [
                   // Player avatar
-                  _playerAvatar(user.avatar),
+                  Material(
+                    child: InkWell(
+                      onTap: () {},
+                      child: _playerAvatar(user.avatar),
+                    ),
+                  ),
                   // Player stats
                   Expanded(
-                    child: _playerStats(user.username, tasksCubit.state.stats!),
+                    child: _playerStats(
+                      user.username,
+                      tasksCubit.state.stats!,
+                    ),
                   ),
                 ],
               ),
@@ -89,7 +108,7 @@ class _PlayerCard extends StatelessWidget {
   }
 
   Widget _playerAvatar(String sprite) {
-    return Container(
+    return Ink(
       height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       decoration: const BoxDecoration(
@@ -125,19 +144,19 @@ class _PlayerCard extends StatelessWidget {
             const Divider(thickness: 3.0),
             Text(
               'Bosses Slain: ${stats.bossesSlain}',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             Text(
               'Enemies Slain: ${stats.enemiesSlain}',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             Text(
               'Tasks Completed: ${stats.tasksCompleted}',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
             Text(
               'Stages Completed: ${stats.stagesCompleted}',
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
           ],
         ),

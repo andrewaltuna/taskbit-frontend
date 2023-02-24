@@ -76,29 +76,31 @@ class _TaskList extends StatelessWidget {
           )
         : RefreshIndicator(
             onRefresh: refreshList(context),
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              itemBuilder: (BuildContext context, int index) {
-                final Task task = tasks[index];
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
-                    child: _TaskItem(task: task),
-                  );
-                }
+            child: Scrollbar(
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                itemBuilder: (BuildContext context, int index) {
+                  final Task task = tasks[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: _TaskItem(task: task),
+                    );
+                  }
 
-                if (index == tasks.length - 1) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: _TaskItem(task: task),
-                  );
-                }
-                return _TaskItem(task: task);
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(height: 10.0),
-              itemCount: tasks.length,
-              physics: const AlwaysScrollableScrollPhysics(),
+                  if (index == tasks.length - 1) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: _TaskItem(task: task),
+                    );
+                  }
+                  return _TaskItem(task: task);
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(height: 10.0),
+                itemCount: tasks.length,
+                physics: const AlwaysScrollableScrollPhysics(),
+              ),
             ),
           );
   }
@@ -133,32 +135,83 @@ class _TaskItem extends StatelessWidget with DateFormatter {
           color: Colors.black.withOpacity(0.04),
           child: InkWell(
             onTap: () {
-              context.read<NavigationCubit>().pageChanged(Pages.taskDetail);
-              context.read<TasksCubit>().taskSelected(task);
+              showDialog(
+                context: context,
+                builder: (context) => _taskDetail(task),
+              );
             },
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+              padding: EdgeInsets.symmetric(
+                  horizontal: task.dateCompleted != null ? 20.0 : 5.0,
+                  vertical: 5.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    task.name,
-                    // style: TextStyle(),
+                  if (task.dateCompleted == null) _completeButton(context),
+                  Expanded(
+                    child: Text(
+                      task.name,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
                   task.dateCompleted == null
-                      ? Row(
+                      ? _popupMenuButton(context)
+                      : Row(
                           children: [
-                            _completeButton(context),
-                            _popupMenuButton(context),
+                            Text(
+                              formatDatePretty(task.dateCompleted!),
+                              style: const TextStyle(
+                                color: Colors.green,
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                            ),
                           ],
-                        )
-                      : Text(formatDate(task.dateCompleted!)),
+                        ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  AlertDialog _taskDetail(Task task) {
+    return AlertDialog(
+      title: Center(
+        child: Text(
+          task.name,
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            task.description ?? "No description given.",
+            style: const TextStyle(fontSize: 16.0),
+          ),
+          const Divider(height: 40.0),
+          Text(
+            task.dateDue != null
+                ? 'Due: ${formatDatePretty(task.dateDue)}'
+                : "No due date given.",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          if (task.dateCompleted != null)
+            Text(
+              'Completed: ${formatDatePretty(task.dateCompleted)}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+        ],
       ),
     );
   }
@@ -180,8 +233,14 @@ class _TaskItem extends StatelessWidget with DateFormatter {
         return;
       },
       itemBuilder: (context) => <PopupMenuEntry>[
-        const PopupMenuItem(value: Pages.taskUpdate, child: Text('Update')),
-        const PopupMenuItem(value: Pages.taskDelete, child: Text('Delete')),
+        const PopupMenuItem(value: Pages.taskUpdate, child: Text('Edit')),
+        const PopupMenuItem(
+          value: Pages.taskDelete,
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
       ],
     );
   }
@@ -190,7 +249,7 @@ class _TaskItem extends StatelessWidget with DateFormatter {
     final tasksCubit = context.read<TasksCubit>();
     final authToken = context.read<LoginCubit>().state.user!.accessToken;
     return IconButton(
-      icon: const Icon(Icons.check),
+      icon: const Icon(Icons.playlist_add_check_circle),
       onPressed: () {
         showDialog(
           context: context,

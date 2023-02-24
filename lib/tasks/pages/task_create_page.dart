@@ -5,6 +5,7 @@ import 'package:taskbit/mixins/date_formatter.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/task_create_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
+import 'package:taskbit/widgets/custom_header.dart';
 
 class TaskCreatePage extends StatelessWidget {
   const TaskCreatePage({super.key});
@@ -27,11 +28,18 @@ class TaskCreatePage extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: _TaskCreateForm(
-          loginCubit: loginCubit,
-          taskCreateCubit: taskCreateCubit,
-          tasksCubit: tasksCubit,
-          navigationCubit: navigationCubit,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomHeader(
+                '${taskCreateCubit.isCreate() ? 'Create' : 'Update'} a Task'),
+            _TaskCreateForm(
+              loginCubit: loginCubit,
+              taskCreateCubit: taskCreateCubit,
+              tasksCubit: tasksCubit,
+              navigationCubit: navigationCubit,
+            ),
+          ],
         ),
       ),
     );
@@ -102,13 +110,12 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
   }
 
   Widget _dateDueField(BuildContext context, TextEditingController controller) {
-    // final taskCreateCubit = context.read<TaskCreateCubit>();
     return TextField(
       onTap: () async {
         DateTime? date = await showDatePicker(
           context: context,
           initialDate: taskCreateCubit.state.dateDue ?? DateTime.now(),
-          firstDate: DateTime.now(),
+          firstDate: DateTime(DateTime.now().year - 5),
           lastDate: DateTime(DateTime.now().year + 5),
         );
 

@@ -15,7 +15,7 @@ class CustomHeader extends StatelessWidget {
       text,
       style: GoogleFonts.pressStart2p(
         fontSize: 20,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.bold,
       ),
     );
   }

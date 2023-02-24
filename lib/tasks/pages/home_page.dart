@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
@@ -55,8 +54,7 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(
-                                top: 20.0, left: 20.0, right: 20.0),
+                            padding: const EdgeInsets.all(20.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,9 +84,21 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           context.read<NavigationCubit>().pageChanged(Pages.taskCreate);
         },
-        child: const Text(
-          'Create +',
-          style: TextStyle(fontSize: 12.0),
+        child: Row(
+          children: const [
+            Text(
+              'ADD',
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: 3.0),
+            Icon(
+              Icons.add_circle,
+              size: 15.0,
+            )
+          ],
         ),
       ),
     );

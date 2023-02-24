@@ -1,15 +1,6 @@
 part of 'navigation_cubit.dart';
 
-enum Pages {
-  login,
-  signUp,
-  home,
-  taskCreate,
-  taskDetail,
-  taskUpdate,
-  taskDelete,
-  profile
-}
+enum Pages { login, signUp, home, taskCreate, taskUpdate, taskDelete, profile }
 
 class NavigationState extends Equatable {
   const NavigationState({

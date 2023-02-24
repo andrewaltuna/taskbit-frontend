@@ -44,8 +44,10 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
       name: task.name,
       description: () => task.description,
       dateDue: () => task.dateDue,
+      nameInputStatus: InputStatus.valid,
+      descriptionInputStatus: InputStatus.valid,
+      dateDueInputStatus: InputStatus.valid,
     ));
-    print(task.dateDue);
   }
 
   void resetState() {
@@ -75,7 +77,11 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
         ),
         variables: {
           'name': state.name,
-          'description': state.description,
+          'description': state.description == null
+              ? null
+              : state.description!.isEmpty
+                  ? null
+                  : state.description,
           'dateDue': state.dateDue?.toString(),
         },
       ),
@@ -113,7 +119,11 @@ class TaskCreateCubit extends Cubit<TaskCreateState> {
         variables: {
           'taskId': state.id,
           'name': state.name,
-          'description': state.description,
+          'description': state.description == null
+              ? null
+              : state.description!.isEmpty
+                  ? null
+                  : state.description,
           'dateDue': state.dateDue?.toString(),
         },
       ),

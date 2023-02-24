@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
-import 'package:taskbit/auth/models/enemy.dart';
 import 'package:taskbit/auth/models/user.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/tasks/models/stage.dart';
@@ -38,6 +37,20 @@ class BattleDisplay extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _stageLabel('${stage.stage}-${stage.substage}'),
+                        if (stage.substage == 4)
+                          Text(
+                            'BOSS',
+                            style: GoogleFonts.pressStart2p(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25.0,
+                              shadows: [
+                                const Shadow(
+                                    color: Colors.black,
+                                    offset: Offset(2.0, 2.0)),
+                              ],
+                            ),
+                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,

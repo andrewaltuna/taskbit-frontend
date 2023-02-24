@@ -37,7 +37,7 @@ const loginQuery = r"""
 
 const createTaskMutation = r"""
             mutation($name: String!, $description: String, $dateDue: String) {
-              newTask (taskDetails: {
+              createTask (taskDetails: {
                 name: $name
                 description: $description
                 dateDue: $dateDue

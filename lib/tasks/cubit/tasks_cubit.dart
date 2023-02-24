@@ -59,8 +59,6 @@ class TasksCubit extends Cubit<TasksState> {
       ),
     );
 
-    // final bool success = result.data != null ? true : false;
-
     final data = result.data!['getTaskEnemy'];
     final Stage stage = Stage.fromJson(data);
     final Stats stats = Stats.fromJson(data);
@@ -69,6 +67,13 @@ class TasksCubit extends Cubit<TasksState> {
     for (var task in data['tasks']) {
       tasks.add(Task.fromJson(task));
     }
+
+    // Sort by dateDue ASCENDING
+    tasks.sort((a, b) => a.dateDue == null
+        ? 1
+        : b.dateDue == null
+            ? -1
+            : a.dateDue!.compareTo(b.dateDue!));
 
     emit(state.copyWith(
       tasks: tasks,

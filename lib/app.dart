@@ -6,9 +6,9 @@ import 'package:taskbit/auth/pages/profile_page.dart';
 import 'package:taskbit/auth/pages/signup_page.dart';
 import 'package:taskbit/constants.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
+import 'package:taskbit/tasks/cubit/task_create_cubit.dart';
 import 'package:taskbit/tasks/pages/home_page.dart';
 import 'package:taskbit/tasks/pages/task_create_page.dart';
-import 'package:taskbit/tasks/pages/task_detail_page.dart';
 import 'package:taskbit/widgets/logo.dart';
 
 class App extends StatelessWidget {
@@ -25,7 +25,6 @@ class App extends StatelessWidget {
       if (selectedPage == Pages.profile) ProfilePage.page(),
       if (selectedPage == Pages.taskCreate || selectedPage == Pages.taskUpdate)
         TaskCreatePage.page(),
-      if (selectedPage == Pages.taskDetail) TaskDetailPage.page(),
     ];
   }
 
@@ -61,6 +60,7 @@ class App extends StatelessWidget {
                   } else {
                     page = Pages.profile;
                   }
+                  context.read<TaskCreateCubit>().resetState();
                   navigationCubit.pageChanged(page);
                 },
                 selectedIndex: navigationCubit
