@@ -13,11 +13,11 @@ class BattleDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
-      builder: (context, state) {
-        Stage stage = state.stage!;
+      builder: (context, tasksState) {
+        Stage stage = tasksState.stage!;
         return BlocBuilder<LoginCubit, LoginState>(
-          builder: (context, state) {
-            User user = state.user!;
+          builder: (context, loginState) {
+            User user = loginState.user!;
             String userSprite = user.avatar;
             return Column(
               children: [
@@ -56,12 +56,27 @@ class BattleDisplay extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             // player sprite
-                            Sprite('avatars/$userSprite', height: 70),
+                            Expanded(
+                              child: AnimatedAlign(
+                                alignment: tasksState.enemyIsVisible
+                                    ? Alignment.centerLeft
+                                    : Alignment.centerRight,
+                                duration: const Duration(milliseconds: 500),
+                                child: Sprite(
+                                  'avatars/$userSprite',
+                                  height: 70,
+                                ),
+                              ),
+                            ),
                             // enemy sprite
-                            Transform.scale(
-                              scaleX: 1,
-                              child: Sprite('enemies/${stage.enemy.sprite}',
-                                  height: 70),
+
+                            AnimatedOpacity(
+                              opacity: tasksState.enemyIsVisible ? 1 : 0,
+                              duration: const Duration(milliseconds: 100),
+                              child: Sprite(
+                                'enemies/${stage.enemy.sprite}',
+                                height: 70,
+                              ),
                             ),
                           ],
                         ),

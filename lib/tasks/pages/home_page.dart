@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
-import 'package:taskbit/widgets/battle_display.dart';
+import 'package:taskbit/tasks/widgets/battle_display.dart';
 import 'package:taskbit/widgets/custom_header.dart';
-import 'package:taskbit/widgets/task_display.dart';
+import 'package:taskbit/tasks/widgets/task_display.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {

@@ -19,6 +19,15 @@ class SignupCubit extends Cubit<SignupState> {
         state.selectedAvatarIndex != null;
   }
 
+  void userLoggedIn(String authToken) {
+    emit(state.copyWith(authToken: authToken));
+  }
+
+  void toggleProfileAvatarSelectVisibility() {
+    emit(state.copyWith(
+        isProfileAvatarSelectVisible: !state.isProfileAvatarSelectVisible));
+  }
+
   void avatarSelected(int index) {
     emit(state.copyWith(selectedAvatarIndex: () => index));
   }
@@ -67,6 +76,10 @@ class SignupCubit extends Cubit<SignupState> {
     emit(SignupState());
   }
 
+  String avatarSpriteName() {
+    return state.avatars[state.selectedAvatarIndex!].substring(8);
+  }
+
   Future<bool> registerUser() async {
     HttpLink link = HttpLink(graphQlLink);
     GraphQLClient gqlClient = GraphQLClient(
@@ -87,7 +100,7 @@ class SignupCubit extends Cubit<SignupState> {
           'first_name': state.firstName,
           'last_name': state.lastName,
           'password': state.password,
-          'avatar': state.avatars[state.selectedAvatarIndex!].substring(8),
+          'avatar': avatarSpriteName(),
         },
       ),
     );
@@ -104,5 +117,48 @@ class SignupCubit extends Cubit<SignupState> {
       ));
     }
     return success;
+  }
+
+  Future<bool> updateAvatar({required String authToken}) async {
+    final HttpLink link = HttpLink(graphQlLink);
+
+    final AuthLink authLink =
+        AuthLink(getToken: () async => 'Bearer $authToken');
+
+    final authorizedLink = authLink.concat(link);
+
+    GraphQLClient gqlClient = GraphQLClient(
+      link: authorizedLink,
+      cache: GraphQLCache(
+        store: HiveStore(),
+      ),
+    );
+
+    QueryResult result = await gqlClient.mutate(
+      MutationOptions(
+        fetchPolicy: FetchPolicy.networkOnly,
+        document: gql(
+          gqlstrings.updateAvatarMutation,
+        ),
+        variables: {
+          'avatar': avatarSpriteName(),
+        },
+      ),
+    );
+
+    return true;
+
+    // final bool success = result.data!['signUp'] ?? false;
+
+    // if (success) {
+    //   resetState();
+    // } else {
+    //   emit(state.copyWith(
+    //     usernameInputStatus: InputStatus.invalid,
+    //     password: '',
+    //     passwordInputStatus: InputStatus.initial,
+    //   ));
+    // }
+    // return success;
   }
 }

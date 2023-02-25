@@ -2,6 +2,7 @@ part of 'signup_cubit.dart';
 
 class SignupState extends Equatable {
   SignupState({
+    this.authToken,
     this.selectedAvatarIndex,
     this.firstName = '',
     this.lastName = '',
@@ -11,8 +12,10 @@ class SignupState extends Equatable {
     this.lastNameInputStatus = InputStatus.initial,
     this.usernameInputStatus = InputStatus.initial,
     this.passwordInputStatus = InputStatus.initial,
+    this.isProfileAvatarSelectVisible = false,
   });
 
+  final String? authToken;
   final int? selectedAvatarIndex;
   final String firstName;
   final String lastName;
@@ -22,6 +25,7 @@ class SignupState extends Equatable {
   final InputStatus lastNameInputStatus;
   final InputStatus usernameInputStatus;
   final InputStatus passwordInputStatus;
+  final bool isProfileAvatarSelectVisible;
 
   final List<String> avatars = [
     'avatars/knight',
@@ -30,6 +34,7 @@ class SignupState extends Equatable {
   ];
 
   SignupState copyWith({
+    String? authToken,
     ValueGetter<int?>? selectedAvatarIndex,
     String? firstName,
     String? lastName,
@@ -39,8 +44,10 @@ class SignupState extends Equatable {
     InputStatus? lastNameInputStatus,
     InputStatus? usernameInputStatus,
     InputStatus? passwordInputStatus,
+    bool? isProfileAvatarSelectVisible,
   }) {
     return SignupState(
+      authToken: authToken ?? this.authToken,
       selectedAvatarIndex: selectedAvatarIndex != null
           ? selectedAvatarIndex()
           : this.selectedAvatarIndex,
@@ -52,11 +59,14 @@ class SignupState extends Equatable {
       lastNameInputStatus: lastNameInputStatus ?? this.lastNameInputStatus,
       usernameInputStatus: usernameInputStatus ?? this.usernameInputStatus,
       passwordInputStatus: passwordInputStatus ?? this.passwordInputStatus,
+      isProfileAvatarSelectVisible:
+          isProfileAvatarSelectVisible ?? this.isProfileAvatarSelectVisible,
     );
   }
 
   @override
   List<Object?> get props => [
+        authToken,
         selectedAvatarIndex,
         firstName,
         lastName,
@@ -66,5 +76,6 @@ class SignupState extends Equatable {
         lastNameInputStatus,
         usernameInputStatus,
         passwordInputStatus,
+        isProfileAvatarSelectVisible,
       ];
 }

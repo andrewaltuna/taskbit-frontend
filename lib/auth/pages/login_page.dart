@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/auth/cubit/signup_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/logo.dart';
@@ -18,6 +19,7 @@ class LoginPage extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       child: _LoginForm(
         loginCubit: context.read<LoginCubit>(),
+        signupCubit: context.read<SignupCubit>(),
         navigationCubit: context.read<NavigationCubit>(),
       ),
     );
@@ -27,10 +29,12 @@ class LoginPage extends StatelessWidget {
 class _LoginForm extends StatelessWidget {
   const _LoginForm({
     required this.loginCubit,
+    required this.signupCubit,
     required this.navigationCubit,
   });
 
   final LoginCubit loginCubit;
+  final SignupCubit signupCubit;
   final NavigationCubit navigationCubit;
 
   @override
@@ -45,7 +49,7 @@ class _LoginForm extends StatelessWidget {
             _usernameField(),
             _passwordField(),
             const SizedBox(height: 30.0),
-            _submitButton(),
+            _submitButton(context),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -87,7 +91,7 @@ class _LoginForm extends StatelessWidget {
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -95,6 +99,7 @@ class _LoginForm extends StatelessWidget {
             ? null
             : () async {
                 if (await loginCubit.fetchUser() == true) {
+                  signupCubit.userLoggedIn(loginCubit.state.user!.accessToken);
                   navigationCubit.pageChanged(Pages.home);
                 }
               },

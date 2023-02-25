@@ -26,11 +26,47 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   List<Task> ongoingTasks() {
-    return state.tasks.where((task) => task.dateCompleted == null).toList();
+    // Sorted by date due ascending
+    List<Task> tasks =
+        state.tasks.where((task) => task.dateCompleted == null).toList();
+    tasks.sort((a, b) => a.dateDue == null
+        ? 1
+        : b.dateDue == null
+            ? -1
+            : a.dateDue!.compareTo(b.dateDue!));
+    return tasks;
   }
 
   List<Task> completedTasks() {
-    return state.tasks.where((task) => task.dateCompleted != null).toList();
+    // Sorted by date completed, followed by date due ascending
+    List<Task> tasks =
+        state.tasks.where((task) => task.dateCompleted != null).toList();
+    tasks.sort((a, b) {
+      int cmp = a.dateDue == null
+          ? 1
+          : b.dateDue == null
+              ? -1
+              : a.dateDue!.compareTo(b.dateDue!);
+      if (cmp != 0) return cmp;
+      return b.dateCompleted!.compareTo(a.dateCompleted!);
+    });
+    return tasks;
+  }
+
+  Future<void> toggleEnemyOpacity() async {
+    emit(state.copyWith(enemyIsVisible: false));
+    await Future.delayed(
+      const Duration(milliseconds: 200),
+      () async {
+        emit(state.copyWith(enemyIsVisible: true));
+      },
+    );
+  }
+
+  Future<void> damageIndicator() async {
+    await toggleEnemyOpacity();
+    await Future.delayed(const Duration(milliseconds: 200));
+    await toggleEnemyOpacity();
   }
 
   // GRAPHQL CALLS
@@ -68,14 +104,19 @@ class TasksCubit extends Cubit<TasksState> {
       tasks.add(Task.fromJson(task));
     }
 
-    // Sort by dateDue ASCENDING
-    tasks.sort((a, b) => a.dateDue == null
-        ? 1
-        : b.dateDue == null
-            ? -1
-            : a.dateDue!.compareTo(b.dateDue!));
+    if (state.tasksStatus != TasksStatus.initial) {
+      int oldHp = 0;
+      if (state.stage != null) {
+        oldHp = state.stage!.enemy.currentHp;
+      }
+
+      if (stage.enemy.currentHp != oldHp) {
+        await damageIndicator();
+      }
+    }
 
     emit(state.copyWith(
+      tasksStatus: TasksStatus.loaded,
       tasks: tasks,
       stage: () => stage,
       stats: () => stats,

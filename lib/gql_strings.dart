@@ -10,6 +10,16 @@ const createUserMutation = r"""
             }
           """;
 
+const updateAvatarMutation = r"""
+            mutation($avatar: String!) {
+              changeAvatar (
+                avatar: $avatar
+              ) {
+                username
+              }
+            }
+          """;
+
 const loginQuery = r"""
             query($username: String!, $password: String!) {
               signIn(loginDetails: {

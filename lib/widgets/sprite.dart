@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Sprite extends StatelessWidget {
-  const Sprite(this.path, {super.key, required this.height});
+  const Sprite(
+    this.path, {
+    super.key,
+    required this.height,
+  });
 
   final String path;
   final double height;

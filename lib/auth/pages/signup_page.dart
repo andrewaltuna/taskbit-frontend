@@ -5,6 +5,7 @@ import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/auth/cubit/signup_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
+import 'package:taskbit/widgets/avatar_select.dart';
 import 'package:taskbit/widgets/logo.dart';
 import 'package:taskbit/widgets/sprite.dart';
 
@@ -56,7 +57,7 @@ class _SignupForm extends StatelessWidget {
             children: [
               const Logo(),
               const SizedBox(height: 20.0),
-              const _AvatarSelect(),
+              const AvatarSelect(),
               Row(
                 children: [
                   Expanded(child: _firstNameField()),
@@ -149,71 +150,5 @@ class _SignupForm extends StatelessWidget {
 
   SnackBar successSnackBar() {
     return const SnackBar(content: Text('Successfuly registered!'));
-  }
-}
-
-class _AvatarSelect extends StatelessWidget {
-  const _AvatarSelect();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SignupCubit, SignupState>(
-      builder: (context, state) {
-        return Container(
-          padding: const EdgeInsets.all(20.0),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            image: const DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage('assets/images/stats_background.png'),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Choose your Avatar',
-                style: GoogleFonts.pressStart2p(color: Colors.white),
-              ),
-              const SizedBox(height: 10.0),
-              SizedBox(
-                height: 70,
-                child: ListView.separated(
-                  itemBuilder: ((context, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Material(
-                        color: index ==
-                                context
-                                    .read<SignupCubit>()
-                                    .state
-                                    .selectedAvatarIndex
-                            ? Colors.black.withOpacity(0.5)
-                            : Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            context.read<SignupCubit>().avatarSelected(index);
-                          },
-                          child: Sprite(
-                            context.read<SignupCubit>().state.avatars[index],
-                            height: 70,
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                  separatorBuilder: ((context, index) =>
-                      const SizedBox(width: 10.0)),
-                  itemCount: 3,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                ),
-              )
-            ],
-          ),
-        );
-      },
-    );
   }
 }

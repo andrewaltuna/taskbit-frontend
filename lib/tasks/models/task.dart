@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
 
 class Task extends Equatable with DateFormatter {
@@ -26,6 +25,17 @@ class Task extends Equatable with DateFormatter {
     // dateCreated = data['dateCreated'];
     dateDue = DateTime.tryParse(data['dateDue'] ?? '');
     dateCompleted = DateTime.tryParse(data['dateCompleted'] ?? '');
+  }
+
+  bool isLate() {
+    if (dateDue == null) {
+      return false;
+    }
+    return dateDue!.isBefore(DateTime.now());
+  }
+
+  bool isCompleted() {
+    return dateCompleted != null;
   }
 
   // Task copyWith({
