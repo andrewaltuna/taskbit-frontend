@@ -202,7 +202,7 @@ class TaskItem extends StatelessWidget with DateFormatter {
         TextButton(
           onPressed: () async {
             if (isComplete
-                ? await tasksCubit.taskDeleted(
+                ? await tasksCubit.taskCompleted(
                     authToken: authToken,
                     task: task,
                   )
