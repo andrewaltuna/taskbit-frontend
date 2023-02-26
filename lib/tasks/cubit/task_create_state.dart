@@ -50,4 +50,12 @@ class TaskCreateState extends Equatable {
         descriptionInputStatus,
         dateDueInputStatus,
       ];
+
+  bool formIsValid() {
+    return nameInputStatus == InputStatus.valid;
+  }
+
+  bool isCreate() {
+    return id == null;
+  }
 }

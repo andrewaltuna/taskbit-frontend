@@ -131,7 +131,7 @@ class _SignupForm extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: !signupCubit.formIsValid()
+        onPressed: !signupCubit.state.formIsValid()
             ? null
             : () async {
                 if (await signupCubit.registerUser() == true) {

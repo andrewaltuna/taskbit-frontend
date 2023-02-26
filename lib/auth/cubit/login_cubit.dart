@@ -11,11 +11,6 @@ part 'login_state.dart';
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(const LoginState());
 
-  bool formIsValid() {
-    return state.usernameInputStatus == InputStatus.valid &&
-        state.passwordInputStatus == InputStatus.valid;
-  }
-
   void usernameChanged(String value) {
     if (value.isEmpty) {
       emit(state.copyWith(
@@ -60,8 +55,6 @@ class LoginCubit extends Cubit<LoginState> {
         },
       ),
     );
-
-    print(result);
 
     if (!result.hasException || result.data != null) {
       var data = result.data!['signIn'];

@@ -78,4 +78,16 @@ class SignupState extends Equatable {
         passwordInputStatus,
         isProfileAvatarSelectVisible,
       ];
+
+  bool formIsValid() {
+    return firstNameInputStatus == InputStatus.valid &&
+        lastNameInputStatus == InputStatus.valid &&
+        usernameInputStatus == InputStatus.valid &&
+        passwordInputStatus == InputStatus.valid &&
+        selectedAvatarIndex != null;
+  }
+
+  String avatarSpriteName() {
+    return avatars[selectedAvatarIndex!].substring(8);
+  }
 }

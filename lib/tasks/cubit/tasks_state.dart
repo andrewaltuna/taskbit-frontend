@@ -46,4 +46,37 @@ class TasksState extends Equatable {
         selectedTask,
         enemyIsVisible,
       ];
+
+  List<Task> ongoingTasks() {
+    // Sorted by date due ascending
+    List<Task> ongoingTasks =
+        tasks.where((task) => task.dateCompleted == null).toList();
+    ongoingTasks.sort((a, b) => a.dateDue == null
+        ? 1
+        : b.dateDue == null
+            ? -1
+            : a.dateDue!.compareTo(b.dateDue!));
+    return ongoingTasks;
+  }
+
+  List<Task> completedTasks() {
+    // Sorted by date completed, followed by date due ascending
+    List<Task> completedTasks =
+        tasks.where((task) => task.dateCompleted != null).toList();
+
+    completedTasks.sort((a, b) {
+      int compare = DateUtils.dateOnly(b.dateCompleted!)
+          .compareTo(DateUtils.dateOnly(a.dateCompleted!));
+
+      if (compare == 0) {
+        return a.dateDue == null
+            ? 1
+            : b.dateDue == null
+                ? -1
+                : a.dateDue!.compareTo(b.dateDue!);
+      }
+      return compare;
+    });
+    return completedTasks;
+  }
 }

@@ -19,53 +19,45 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NavigationCubit navigationCubit = context.read<NavigationCubit>();
     SignupCubit signupCubit = context.read<SignupCubit>();
 
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, tasksState) {
         return BlocBuilder<SignupCubit, SignupState>(
           builder: (context, signupState) {
-            return WillPopScope(
-              onWillPop: () async {
-                navigationCubit.pageChanged(Pages.home);
-                return true;
-              },
-              child: tasksState.stats == null
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          const SizedBox(height: 20.0),
-                          const CustomHeader('Profile'),
-                          const SizedBox(height: 10.0),
-                          const _PlayerCard(),
-                          const SizedBox(height: 10.0),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 100),
-                            child:
-                                signupCubit.state.isProfileAvatarSelectVisible
-                                    ? _updateAvatarWidget(context)
-                                    : const SizedBox.shrink(),
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: _logoutButton(context),
-                              ),
+            return tasksState.stats == null
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const SizedBox(height: 20.0),
+                        const CustomHeader('Profile'),
+                        const SizedBox(height: 10.0),
+                        const _PlayerCard(),
+                        const SizedBox(height: 10.0),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 100),
+                          child: signupCubit.state.isProfileAvatarSelectVisible
+                              ? _updateAvatarWidget(context)
+                              : const SizedBox.shrink(),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: _logoutButton(context),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-            );
+                  );
           },
         );
       },
@@ -83,21 +75,22 @@ class ProfilePage extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed:
-                loginCubit.state.user!.avatar == signupCubit.avatarSpriteName()
-                    ? null
-                    : () async {
-                        final authToken = loginCubit.state.user!.accessToken;
-                        signupCubit.updateAvatar(authToken: authToken);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Avatar updated! Restart the app to see changes.'),
-                            ),
-                          );
-                        }
-                      },
+            onPressed: loginCubit.state.user!.avatar ==
+                    signupCubit.state.avatarSpriteName()
+                ? null
+                : () async {
+                    final authToken = loginCubit.state.user!.accessToken;
+                    signupCubit.updateAvatar(authToken: authToken);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Avatar updated! Restart the app to see changes.'),
+                        ),
+                      );
+                    }
+                    signupCubit.toggleProfileAvatarSelectVisibility();
+                  },
             child: const Text('Update Avatar'),
           ),
         ),
@@ -119,7 +112,7 @@ class ProfilePage extends StatelessWidget {
         loginCubit.resetState();
         tasksCubit.resetState();
         signupCubit.resetState();
-        navigationCubit.pageChanged(Pages.login);
+        navigationCubit.resetState();
       },
       child: const Text(
         'Logout',

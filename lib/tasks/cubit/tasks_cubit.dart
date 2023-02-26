@@ -25,34 +25,6 @@ class TasksCubit extends Cubit<TasksState> {
     emit(const TasksState());
   }
 
-  List<Task> ongoingTasks() {
-    // Sorted by date due ascending
-    List<Task> tasks =
-        state.tasks.where((task) => task.dateCompleted == null).toList();
-    tasks.sort((a, b) => a.dateDue == null
-        ? 1
-        : b.dateDue == null
-            ? -1
-            : a.dateDue!.compareTo(b.dateDue!));
-    return tasks;
-  }
-
-  List<Task> completedTasks() {
-    // Sorted by date completed, followed by date due ascending
-    List<Task> tasks =
-        state.tasks.where((task) => task.dateCompleted != null).toList();
-    tasks.sort((a, b) {
-      int cmp = a.dateDue == null
-          ? 1
-          : b.dateDue == null
-              ? -1
-              : a.dateDue!.compareTo(b.dateDue!);
-      if (cmp != 0) return cmp;
-      return b.dateCompleted!.compareTo(a.dateCompleted!);
-    });
-    return tasks;
-  }
-
   Future<void> toggleEnemyOpacity() async {
     emit(state.copyWith(enemyIsVisible: false));
     await Future.delayed(

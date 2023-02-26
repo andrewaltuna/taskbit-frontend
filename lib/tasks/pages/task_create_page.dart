@@ -23,7 +23,7 @@ class TaskCreatePage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async {
         taskCreateCubit.resetState();
-        navigationCubit.pageChanged(Pages.home);
+        navigationCubit.pageDeselected();
         return true;
       },
       child: Padding(
@@ -32,7 +32,7 @@ class TaskCreatePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CustomHeader(
-                '${taskCreateCubit.isCreate() ? 'Create' : 'Update'} a Task'),
+                '${taskCreateCubit.state.isCreate() ? 'Create' : 'Update'} a Task'),
             _TaskCreateForm(
               loginCubit: loginCubit,
               taskCreateCubit: taskCreateCubit,
@@ -64,13 +64,14 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
     final dateDueController = TextEditingController();
-    if (!taskCreateCubit.isCreate()) {
-      nameController.text = taskCreateCubit.state.name;
-      descriptionController.text = taskCreateCubit.state.description ?? '';
-      dateDueController.text = formatDate(taskCreateCubit.state.dateDue);
-    }
+
     return BlocBuilder<TaskCreateCubit, TaskCreateState>(
       builder: (context, state) {
+        if (!state.isCreate()) {
+          nameController.text = state.name;
+          descriptionController.text = state.description ?? '';
+          dateDueController.text = formatDate(state.dateDue);
+        }
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -79,7 +80,7 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
             _descriptionField(descriptionController),
             _dateDueField(context, dateDueController),
             const SizedBox(height: 30.0),
-            _submitButton(),
+            _submitButton(context),
           ],
         );
       },
@@ -133,33 +134,35 @@ class _TaskCreateForm extends StatelessWidget with DateFormatter {
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(BuildContext context) {
+    final isCreate = taskCreateCubit.state.isCreate();
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: !taskCreateCubit.formIsValid()
+        onPressed: !taskCreateCubit.state.formIsValid()
             ? null
-            : taskCreateCubit.isCreate()
-                ? _createFunction
-                : _updateFunction,
-        child: Text(taskCreateCubit.isCreate() ? 'Create' : 'Update'),
+            : () => _submitFunction(context, isCreate),
+        child: Text(isCreate ? 'Create' : 'Update'),
       ),
     );
   }
 
-  void _createFunction() async {
+  void _submitFunction(BuildContext context, bool isCreate) async {
     String authToken = loginCubit.state.user!.accessToken;
-    if (await taskCreateCubit.createTask(authToken: authToken)) {
+    if (isCreate
+        ? await taskCreateCubit.createTask(authToken: authToken)
+        : await taskCreateCubit.updateTask(authToken: authToken)) {
       await tasksCubit.fetchTasksEnemyData(authToken: authToken);
       navigationCubit.pageChanged(Pages.home);
-    }
-  }
 
-  void _updateFunction() async {
-    String authToken = loginCubit.state.user!.accessToken;
-    if (await taskCreateCubit.updateTask(authToken: authToken)) {
-      await tasksCubit.fetchTasksEnemyData(authToken: authToken);
-      navigationCubit.pageChanged(Pages.home);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Task successfully ${isCreate ? 'created' : 'updated'}!'),
+          ),
+        );
+      }
     }
   }
 }

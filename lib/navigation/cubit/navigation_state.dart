@@ -4,19 +4,29 @@ enum Pages { login, signUp, home, taskCreate, taskUpdate, taskDelete, profile }
 
 class NavigationState extends Equatable {
   const NavigationState({
+    this.navIndex = 0,
     this.selectedPage = Pages.login,
   });
 
-  final Pages selectedPage;
+  final int navIndex;
+  final Pages? selectedPage;
 
   NavigationState copyWith({
-    Pages? selectedPage,
+    int? navIndex,
+    ValueGetter<Pages?>? selectedPage,
   }) {
     return NavigationState(
-      selectedPage: selectedPage ?? this.selectedPage,
+      navIndex: navIndex ?? this.navIndex,
+      selectedPage: selectedPage != null ? selectedPage() : this.selectedPage,
     );
   }
 
   @override
-  List<Object?> get props => [selectedPage];
+  List<Object?> get props => [navIndex, selectedPage];
+
+  // GETTERS
+
+  bool pageIsAuth() {
+    return selectedPage == Pages.login || selectedPage == Pages.signUp;
+  }
 }

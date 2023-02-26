@@ -8,31 +8,37 @@ import 'package:taskbit/tasks/widgets/task_display.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({
-    super.key,
-    // required this.tasks,
-  });
+  const HomePage({super.key});
 
   static Page page() {
     return const MaterialPage<void>(child: HomePage());
   }
-
-  // final List<Task> tasks;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late TasksCubit tasksCubit;
+  late LoginCubit loginCubit;
+  late NavigationCubit navigationCubit;
+
   @override
   void initState() {
-    TasksCubit tasksCubit = context.read<TasksCubit>();
-    String authToken = context.read<LoginCubit>().state.user!.accessToken;
+    tasksCubit = context.read<TasksCubit>();
+    navigationCubit = context.read<NavigationCubit>();
+    loginCubit = context.read<LoginCubit>();
 
-    Future.delayed(
-      const Duration(seconds: 1),
-      () => tasksCubit.fetchTasksEnemyData(authToken: authToken),
-    );
+    final user = loginCubit.state.user;
+
+    if (user != null) {
+      Future.delayed(
+        const Duration(seconds: 1),
+        () => tasksCubit.fetchTasksEnemyData(authToken: user.accessToken),
+      );
+    } else {
+      navigationCubit.resetState();
+    }
 
     super.initState();
   }

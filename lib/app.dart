@@ -15,14 +15,14 @@ class App extends StatelessWidget {
   const App({super.key});
 
   List<Page> onGeneratePages(NavigationState state, List<Page> pages) {
-    // final selectedTask = state.selectedTask;
     final selectedPage = state.selectedPage;
     return [
-      selectedPage == Pages.login || selectedPage == Pages.signUp
+      state.pageIsAuth()
           ? LoginPage.page()
-          : HomePage.page(),
+          : state.navIndex == 0
+              ? HomePage.page()
+              : ProfilePage.page(),
       if (selectedPage == Pages.signUp) SignupPage.page(),
-      if (selectedPage == Pages.profile) ProfilePage.page(),
       if (selectedPage == Pages.taskCreate || selectedPage == Pages.taskUpdate)
         TaskCreatePage.page(),
     ];
@@ -31,18 +31,20 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigationCubit = context.read<NavigationCubit>();
+    final taskCreateCubit = context.read<TaskCreateCubit>();
     return MaterialApp(
       title: appName,
       theme: ThemeData(
         useMaterial3: true,
-        appBarTheme: const AppBarTheme(color: Color.fromRGBO(197, 84, 84, 1.0)),
+        appBarTheme: const AppBarTheme(color: Color.fromRGBO(197, 84, 84, 1)),
       ),
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: navigationCubit.pageIsAuth() // selectedPage is LoginPage
+        appBar: navigationCubit.state.pageIsAuth()
             ? null
             : AppBar(
                 title: const Logo(),
-                elevation: 10.0,
+                elevation: 10,
                 shadowColor: Colors.black,
               ),
         body: SafeArea(
@@ -50,30 +52,29 @@ class App extends StatelessWidget {
               state: context.watch<NavigationCubit>().state,
               onGeneratePages: onGeneratePages),
         ),
-        bottomNavigationBar: navigationCubit.pageIsAuth()
+        bottomNavigationBar: navigationCubit.state.pageIsAuth()
             ? null
-            : NavigationBar(
-                onDestinationSelected: (int index) {
-                  Pages page;
-                  if (index == 0) {
-                    page = Pages.home;
-                  } else {
-                    page = Pages.profile;
-                  }
-                  context.read<TaskCreateCubit>().resetState();
-                  navigationCubit.pageChanged(page);
+            : BottomNavigationBar(
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                onTap: (int index) {
+                  navigationCubit.navChanged(index);
+                  taskCreateCubit.resetState();
                 },
-                selectedIndex: navigationCubit
-                    .getPageNavIndex(navigationCubit.state.selectedPage),
-                destinations: const [
-                  NavigationDestination(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  NavigationDestination(
-                    icon: Icon(Icons.person),
-                    label: 'Profile',
-                  ),
+                currentIndex: navigationCubit.state.navIndex,
+                items: const [
+                  // NavigationDestination(
+                  //   icon: Icon(Icons.home),
+                  //   label: 'Home',
+                  // ),
+                  // NavigationDestination(
+                  //   icon: Icon(Icons.person),
+                  //   label: 'Profile',
+                  // ),
+                  BottomNavigationBarItem(
+                      label: 'Home', icon: Icon(Icons.home)),
+                  BottomNavigationBarItem(
+                      label: 'Profile', icon: Icon(Icons.person)),
                 ],
               ),
       ),

@@ -12,14 +12,6 @@ part 'task_create_state.dart';
 class TaskCreateCubit extends Cubit<TaskCreateState> {
   TaskCreateCubit() : super(const TaskCreateState());
 
-  bool formIsValid() {
-    return state.nameInputStatus == InputStatus.valid;
-  }
-
-  bool isCreate() {
-    return state.id == null;
-  }
-
   void nameChanged(String value) {
     if (value.isEmpty) {
       emit(state.copyWith(name: value, nameInputStatus: InputStatus.invalid));

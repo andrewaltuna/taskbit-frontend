@@ -37,20 +37,7 @@ class BattleDisplay extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _stageLabel('${stage.stage}-${stage.substage}'),
-                        if (stage.substage == 4)
-                          Text(
-                            'BOSS',
-                            style: GoogleFonts.pressStart2p(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25.0,
-                              shadows: [
-                                const Shadow(
-                                    color: Colors.black,
-                                    offset: Offset(2.0, 2.0)),
-                              ],
-                            ),
-                          ),
+                        if (stage.substage == 4) _bossIndicator(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -106,6 +93,20 @@ class BattleDisplay extends StatelessWidget {
           },
         );
       },
+    );
+  }
+
+  Widget _bossIndicator() {
+    return Text(
+      'BOSS',
+      style: GoogleFonts.pressStart2p(
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
+        fontSize: 25.0,
+        shadows: [
+          const Shadow(color: Colors.black, offset: Offset(2.0, 2.0)),
+        ],
+      ),
     );
   }
 

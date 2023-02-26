@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/auth/cubit/signup_cubit.dart';
 import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
 import 'package:taskbit/widgets/logo.dart';
 
 class LoginPage extends StatelessWidget {
@@ -95,12 +94,12 @@ class _LoginForm extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: !loginCubit.formIsValid()
+        onPressed: !loginCubit.state.formIsValid()
             ? null
             : () async {
                 if (await loginCubit.fetchUser() == true) {
                   signupCubit.userLoggedIn(loginCubit.state.user!.accessToken);
-                  navigationCubit.pageChanged(Pages.home);
+                  navigationCubit.pageDeselected();
                 }
               },
         child: const Text('Login'),

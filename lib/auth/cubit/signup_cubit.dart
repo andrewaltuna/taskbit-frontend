@@ -11,14 +11,6 @@ part 'signup_state.dart';
 class SignupCubit extends Cubit<SignupState> {
   SignupCubit() : super(SignupState());
 
-  bool formIsValid() {
-    return state.firstNameInputStatus == InputStatus.valid &&
-        state.lastNameInputStatus == InputStatus.valid &&
-        state.usernameInputStatus == InputStatus.valid &&
-        state.passwordInputStatus == InputStatus.valid &&
-        state.selectedAvatarIndex != null;
-  }
-
   void userLoggedIn(String authToken) {
     emit(state.copyWith(authToken: authToken));
   }
@@ -76,10 +68,6 @@ class SignupCubit extends Cubit<SignupState> {
     emit(SignupState());
   }
 
-  String avatarSpriteName() {
-    return state.avatars[state.selectedAvatarIndex!].substring(8);
-  }
-
   Future<bool> registerUser() async {
     HttpLink link = HttpLink(graphQlLink);
     GraphQLClient gqlClient = GraphQLClient(
@@ -100,7 +88,7 @@ class SignupCubit extends Cubit<SignupState> {
           'first_name': state.firstName,
           'last_name': state.lastName,
           'password': state.password,
-          'avatar': avatarSpriteName(),
+          'avatar': state.avatarSpriteName(),
         },
       ),
     );
@@ -141,24 +129,11 @@ class SignupCubit extends Cubit<SignupState> {
           gqlstrings.updateAvatarMutation,
         ),
         variables: {
-          'avatar': avatarSpriteName(),
+          'avatar': state.avatarSpriteName(),
         },
       ),
     );
 
     return true;
-
-    // final bool success = result.data!['signUp'] ?? false;
-
-    // if (success) {
-    //   resetState();
-    // } else {
-    //   emit(state.copyWith(
-    //     usernameInputStatus: InputStatus.invalid,
-    //     password: '',
-    //     passwordInputStatus: InputStatus.initial,
-    //   ));
-    // }
-    // return success;
   }
 }

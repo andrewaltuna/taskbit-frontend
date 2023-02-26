@@ -36,4 +36,9 @@ class LoginState extends Equatable {
   @override
   List<Object?> get props =>
       [user, username, password, usernameInputStatus, passwordInputStatus];
+
+  bool formIsValid() {
+    return usernameInputStatus == InputStatus.valid &&
+        passwordInputStatus == InputStatus.valid;
+  }
 }
