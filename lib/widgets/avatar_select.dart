@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:taskbit/auth/cubit/signup_cubit.dart';
+import 'package:taskbit/cubit/avatar_select_cubit.dart';
 import 'package:taskbit/widgets/sprite.dart';
 
 class AvatarSelect extends StatelessWidget {
@@ -9,9 +9,9 @@ class AvatarSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SignupCubit, SignupState>(
+    final avatarSelectCubit = context.read<AvatarSelectCubit>();
+    return BlocBuilder<AvatarSelectCubit, AvatarSelectState>(
       builder: (context, state) {
-        final signupCubit = context.read<SignupCubit>();
         return Container(
           padding: const EdgeInsets.all(20.0),
           width: double.infinity,
@@ -37,15 +37,15 @@ class AvatarSelect extends StatelessWidget {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),
                       child: Material(
-                        color: index == signupCubit.state.selectedAvatarIndex
+                        color: index == state.selectedAvatarIndex
                             ? Colors.black.withOpacity(0.5)
                             : Colors.transparent,
                         child: InkWell(
                           onTap: () {
-                            signupCubit.avatarSelected(index);
+                            avatarSelectCubit.avatarSelected(index);
                           },
                           child: Sprite(
-                            signupCubit.state.avatars[index],
+                            'avatars/${state.avatarFromIndex(index)}',
                             height: 70,
                           ),
                         ),

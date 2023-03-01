@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskbit/auth/cubit/login_cubit.dart';
-import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
+import 'package:taskbit/core/cubit/user_data_cubit.dart';
 import 'package:taskbit/tasks/models/task.dart';
-import 'package:taskbit/tasks/widgets/task_list_item.dart';
+import 'package:taskbit/core/widgets/task_list_item.dart';
 
 class TaskList extends StatelessWidget {
   const TaskList({
@@ -11,25 +10,32 @@ class TaskList extends StatelessWidget {
     required this.tabIndex,
     required this.tasks,
     required this.emptyText,
-    required this.condition,
   });
 
   final int tabIndex;
   final List<Task> tasks;
   final String emptyText;
-  final bool condition;
 
   @override
   Widget build(BuildContext context) {
-    return condition
+    final userDataCubit = BlocProvider.of<UserDataCubit>(context);
+    return tasks.isEmpty
         ? Center(
             child: Text(
               emptyText,
               textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.black.withOpacity(0.5)),
             ),
           )
         : RefreshIndicator(
-            onRefresh: () => refreshList(context),
+            onRefresh: () async {
+              await Future.delayed(
+                const Duration(seconds: 1),
+                () {
+                  userDataCubit.fetchUserData();
+                },
+              );
+            },
             child: Scrollbar(
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -64,15 +70,5 @@ class TaskList extends StatelessWidget {
               ),
             ),
           );
-  }
-
-  Future refreshList(BuildContext context) {
-    final String authToken = context.read<LoginCubit>().state.user!.accessToken;
-    return Future.delayed(
-      const Duration(seconds: 1),
-      () {
-        context.read<TasksCubit>().fetchTasksEnemyData(authToken: authToken);
-      },
-    );
   }
 }

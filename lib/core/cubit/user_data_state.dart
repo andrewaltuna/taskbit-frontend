@@ -1,14 +1,13 @@
-part of 'tasks_cubit.dart';
+part of 'user_data_cubit.dart';
 
 enum TasksStatus { initial, loaded }
 
-class TasksState extends Equatable {
-  const TasksState({
+class UserDataState extends Equatable {
+  const UserDataState({
     this.tasksStatus = TasksStatus.initial,
     this.tasks = const [],
     this.stage,
     this.stats,
-    this.selectedTask,
     this.enemyIsVisible = true,
   });
 
@@ -16,23 +15,20 @@ class TasksState extends Equatable {
   final List<Task> tasks;
   final Stage? stage;
   final Stats? stats;
-  final Task? selectedTask;
   final bool enemyIsVisible;
 
-  TasksState copyWith({
+  UserDataState copyWith({
     TasksStatus? tasksStatus,
     List<Task>? tasks,
     ValueGetter<Stage?>? stage,
     ValueGetter<Stats?>? stats,
-    ValueGetter<Task?>? selectedTask,
     bool? enemyIsVisible,
   }) {
-    return TasksState(
+    return UserDataState(
       tasksStatus: tasksStatus ?? this.tasksStatus,
       tasks: tasks ?? this.tasks,
       stage: stage != null ? stage() : this.stage,
       stats: stats != null ? stats() : this.stats,
-      selectedTask: selectedTask != null ? selectedTask() : this.selectedTask,
       enemyIsVisible: enemyIsVisible ?? this.enemyIsVisible,
     );
   }
@@ -43,11 +39,10 @@ class TasksState extends Equatable {
         tasks,
         stage,
         stats,
-        selectedTask,
         enemyIsVisible,
       ];
 
-  List<Task> ongoingTasks() {
+  List<Task> get ongoingTasks {
     // Sorted by date due ascending
     List<Task> ongoingTasks =
         tasks.where((task) => task.dateCompleted == null).toList();
@@ -59,7 +54,7 @@ class TasksState extends Equatable {
     return ongoingTasks;
   }
 
-  List<Task> completedTasks() {
+  List<Task> get completedTasks {
     // Sorted by date completed, followed by date due ascending
     List<Task> completedTasks =
         tasks.where((task) => task.dateCompleted != null).toList();
@@ -79,4 +74,6 @@ class TasksState extends Equatable {
     });
     return completedTasks;
   }
+
+  bool get isLoaded => stage != null && stats != null;
 }

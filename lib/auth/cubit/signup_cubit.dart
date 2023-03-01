@@ -4,24 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/constants.dart';
+import 'package:taskbit/cubit/avatar_select_cubit.dart';
+import 'package:taskbit/repositories/auth_repository.dart';
 import '../../gql_strings.dart' as gqlstrings;
 
 part 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignupState> {
-  SignupCubit() : super(SignupState());
+  SignupCubit({required this.avatarSelectCubit}) : super(const SignupState());
+
+  final AvatarSelectCubit avatarSelectCubit;
 
   void userLoggedIn(String authToken) {
     emit(state.copyWith(authToken: authToken));
-  }
-
-  void toggleProfileAvatarSelectVisibility() {
-    emit(state.copyWith(
-        isProfileAvatarSelectVisible: !state.isProfileAvatarSelectVisible));
-  }
-
-  void avatarSelected(int index) {
-    emit(state.copyWith(selectedAvatarIndex: () => index));
   }
 
   void firstNameChanged(String value) {
@@ -65,75 +60,28 @@ class SignupCubit extends Cubit<SignupState> {
   }
 
   void resetState() {
-    emit(SignupState());
+    emit(const SignupState());
   }
 
   Future<bool> registerUser() async {
-    HttpLink link = HttpLink(graphQlLink);
-    GraphQLClient gqlClient = GraphQLClient(
-      link: link,
-      cache: GraphQLCache(
-        store: HiveStore(),
-      ),
+    final success = await AuthRepository().signup(
+      username: state.username,
+      firstName: state.firstName,
+      lastName: state.lastName,
+      password: state.password,
+      avatar: avatarSelectCubit.state.selectedAvatar!,
     );
-
-    QueryResult result = await gqlClient.mutate(
-      MutationOptions(
-        fetchPolicy: FetchPolicy.networkOnly,
-        document: gql(
-          gqlstrings.createUserMutation,
-        ),
-        variables: {
-          'username': state.username,
-          'first_name': state.firstName,
-          'last_name': state.lastName,
-          'password': state.password,
-          'avatar': state.avatarSpriteName(),
-        },
-      ),
-    );
-
-    final bool success = result.data!['signUp'] ?? false;
 
     if (success) {
       resetState();
+      avatarSelectCubit.resetState();
     } else {
       emit(state.copyWith(
         usernameInputStatus: InputStatus.invalid,
         password: '',
-        passwordInputStatus: InputStatus.initial,
+        passwordInputStatus: InputStatus.invalid,
       ));
     }
     return success;
-  }
-
-  Future<bool> updateAvatar({required String authToken}) async {
-    final HttpLink link = HttpLink(graphQlLink);
-
-    final AuthLink authLink =
-        AuthLink(getToken: () async => 'Bearer $authToken');
-
-    final authorizedLink = authLink.concat(link);
-
-    GraphQLClient gqlClient = GraphQLClient(
-      link: authorizedLink,
-      cache: GraphQLCache(
-        store: HiveStore(),
-      ),
-    );
-
-    QueryResult result = await gqlClient.mutate(
-      MutationOptions(
-        fetchPolicy: FetchPolicy.networkOnly,
-        document: gql(
-          gqlstrings.updateAvatarMutation,
-        ),
-        variables: {
-          'avatar': state.avatarSpriteName(),
-        },
-      ),
-    );
-
-    return true;
   }
 }

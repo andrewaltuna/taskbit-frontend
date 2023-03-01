@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
 
 class Task extends Equatable with DateFormatter {
@@ -6,7 +7,6 @@ class Task extends Equatable with DateFormatter {
     required this.id,
     required this.name,
     this.description,
-    // required this.dateCreated,
     this.dateDue,
     this.dateCompleted,
   });
@@ -14,7 +14,6 @@ class Task extends Equatable with DateFormatter {
   late final String id;
   late final String name;
   late final String? description;
-  // late final String dateCreated;
   late final DateTime? dateDue;
   late final DateTime? dateCompleted;
 
@@ -22,7 +21,6 @@ class Task extends Equatable with DateFormatter {
     id = data['id'];
     name = data['name'];
     description = data['description'];
-    // dateCreated = data['dateCreated'];
     dateDue = DateTime.tryParse(data['dateDue'] ?? '');
     dateCompleted = DateTime.tryParse(data['dateCompleted'] ?? '');
   }
@@ -31,7 +29,7 @@ class Task extends Equatable with DateFormatter {
     if (dateDue == null) {
       return false;
     }
-    return dateDue!.isBefore(DateTime.now());
+    return DateUtils.dateOnly(DateTime.now()).isAfter(dateDue!);
   }
 
   bool isCompleted() {
@@ -62,7 +60,6 @@ class Task extends Equatable with DateFormatter {
         id,
         name,
         description,
-        // dateCreated,
         dateDue,
         dateCompleted,
       ];

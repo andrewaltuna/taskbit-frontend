@@ -1,4 +1,4 @@
-part of 'navigation_cubit.dart';
+part of '../../cubit/navigation_cubit.dart';
 
 enum Pages { login, signUp, home, taskCreate, taskUpdate, taskDelete, profile }
 

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:taskbit/auth/models/enemy.dart';
 
 class User extends Equatable {
   late final String accessToken;

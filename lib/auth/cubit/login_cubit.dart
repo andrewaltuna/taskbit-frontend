@@ -1,10 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:taskbit/auth/models/user.dart';
-import 'package:taskbit/constants.dart';
-import '../../gql_strings.dart' as gqlstrings;
+import 'package:taskbit/repositories/auth_repository.dart';
 
 part 'login_state.dart';
 
@@ -36,33 +34,17 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   Future<bool> fetchUser() async {
-    HttpLink url = HttpLink(graphQlLink);
-    GraphQLClient gqlClient = GraphQLClient(
-      link: url,
-      cache: GraphQLCache(
-        store: HiveStore(),
-      ),
-    );
-    QueryResult result = await gqlClient.query(
-      QueryOptions(
-        fetchPolicy: FetchPolicy.networkOnly,
-        document: gql(
-          gqlstrings.loginQuery,
-        ),
-        variables: {
-          'username': state.username,
-          'password': state.password,
-        },
-      ),
+    final user = await AuthRepository().login(
+      username: state.username,
+      password: state.password,
     );
 
-    if (!result.hasException || result.data != null) {
-      var data = result.data!['signIn'];
-      User user = User.fromJson(data);
+    if (user != null) {
       emit(state.copyWith(user: () => user));
       return true;
+    } else {
+      emit(state.copyWith(passwordInputStatus: InputStatus.invalid));
+      return false;
     }
-    emit(state.copyWith(passwordInputStatus: InputStatus.invalid));
-    return false;
   }
 }

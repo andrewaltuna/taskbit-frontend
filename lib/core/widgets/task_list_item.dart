@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
-import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/tasks/cubit/task_create_cubit.dart';
-import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
+import 'package:taskbit/cubit/navigation_cubit.dart';
+import 'package:taskbit/tasks/cubit/task_cubit.dart';
+import 'package:taskbit/core/cubit/user_data_cubit.dart';
 import 'package:taskbit/tasks/models/task.dart';
 
 class TaskItem extends StatelessWidget with DateFormatter {
@@ -24,7 +24,7 @@ class TaskItem extends StatelessWidget with DateFormatter {
             onTap: () {
               showDialog(
                 context: context,
-                builder: (context) => _taskDetail(task),
+                builder: (context) => _TaskDetailDialog(task: task),
               );
             },
             child: Padding(
@@ -33,7 +33,7 @@ class TaskItem extends StatelessWidget with DateFormatter {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (!task.isCompleted()) _completeButton(context),
+                  if (!task.isCompleted()) _CompleteTaskButton(task: task),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,8 +61,8 @@ class TaskItem extends StatelessWidget with DateFormatter {
                   task.dateCompleted == null
                       ? Row(
                           children: [
-                            if (task.isLate()) _lateTaskIndicator(),
-                            _popupMenuButton(context),
+                            if (task.isLate()) const _LateTaskIndicator(),
+                            _TaskActionsMenu(task: task),
                           ],
                         )
                       : Row(
@@ -89,21 +89,71 @@ class TaskItem extends StatelessWidget with DateFormatter {
       ),
     );
   }
+}
 
-  Widget _lateTaskIndicator() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-      decoration: BoxDecoration(
-          color: Colors.red, borderRadius: BorderRadius.circular(50.0)),
-      child: const Text(
-        'LATE',
-        style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-      ),
+class _CompleteTaskButton extends StatelessWidget {
+  const _CompleteTaskButton({required this.task});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.playlist_add_check_circle),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => _ConfirmationDialog(task),
+        );
+      },
     );
   }
+}
 
-  AlertDialog _taskDetail(Task task) {
+class _TaskActionsMenu extends StatelessWidget {
+  const _TaskActionsMenu({required this.task});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    final navigationCubit = BlocProvider.of<NavigationCubit>(context);
+    return PopupMenuButton(
+      onSelected: (value) async {
+        if (value == Pages.taskUpdate) {
+          taskCubit.copyDetails(task);
+          navigationCubit.pageChanged(value);
+          return;
+        }
+        // Delete was selected
+        showDialog(
+          context: context,
+          builder: (context) => _ConfirmationDialog(task, isComplete: false),
+        );
+        return;
+      },
+      itemBuilder: (context) => <PopupMenuEntry>[
+        const PopupMenuItem(value: Pages.taskUpdate, child: Text('Edit')),
+        const PopupMenuItem(
+          value: Pages.taskDelete,
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TaskDetailDialog extends StatelessWidget with DateFormatter {
+  const _TaskDetailDialog({required this.task});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       title: Center(
         child: Text(
@@ -130,7 +180,8 @@ class TaskItem extends StatelessWidget with DateFormatter {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 10.0),
-              if (task.isLate() && !task.isCompleted()) _lateTaskIndicator(),
+              if (task.isLate() && !task.isCompleted())
+                const _LateTaskIndicator(),
             ],
           ),
           if (task.isCompleted())
@@ -142,51 +193,38 @@ class TaskItem extends StatelessWidget with DateFormatter {
       ),
     );
   }
+}
 
-  Widget _popupMenuButton(BuildContext context) {
-    final taskCreateCubit = context.read<TaskCreateCubit>();
-    final navigationCubit = context.read<NavigationCubit>();
-    return PopupMenuButton(
-      onSelected: (value) async {
-        if (value == Pages.taskUpdate) {
-          taskCreateCubit.copyDetails(task);
-          navigationCubit.pageChanged(value);
-          return;
-        }
-        showDialog(
-          context: context,
-          builder: (context) => taskDialog(context, isComplete: false),
-        );
-        return;
-      },
-      itemBuilder: (context) => <PopupMenuEntry>[
-        const PopupMenuItem(value: Pages.taskUpdate, child: Text('Edit')),
-        const PopupMenuItem(
-          value: Pages.taskDelete,
-          child: Text(
-            'Delete',
-            style: TextStyle(color: Colors.red),
-          ),
-        ),
-      ],
+class _LateTaskIndicator extends StatelessWidget {
+  const _LateTaskIndicator({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+      decoration: BoxDecoration(
+          color: Colors.red, borderRadius: BorderRadius.circular(50.0)),
+      child: const Text(
+        'LATE',
+        style: TextStyle(
+            fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+      ),
     );
   }
+}
 
-  Widget _completeButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.playlist_add_check_circle),
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => taskDialog(context),
-        );
-      },
-    );
-  }
+class _ConfirmationDialog extends StatelessWidget {
+  const _ConfirmationDialog(this.task, {this.isComplete = true});
 
-  AlertDialog taskDialog(BuildContext context, {bool isComplete = true}) {
-    final tasksCubit = context.read<TasksCubit>();
-    final authToken = context.read<LoginCubit>().state.user!.accessToken;
+  final Task task;
+  final bool isComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    final userDataCubit = BlocProvider.of<UserDataCubit>(context);
 
     return AlertDialog(
       title: const Text('Confirmation'),
@@ -202,15 +240,9 @@ class TaskItem extends StatelessWidget with DateFormatter {
         TextButton(
           onPressed: () async {
             if (isComplete
-                ? await tasksCubit.taskCompleted(
-                    authToken: authToken,
-                    task: task,
-                  )
-                : await tasksCubit.taskDeleted(
-                    authToken: authToken,
-                    task: task,
-                  )) {
-              tasksCubit.fetchTasksEnemyData(authToken: authToken);
+                ? await taskCubit.taskCompleted(task)
+                : await taskCubit.taskDeleted(task)) {
+              userDataCubit.fetchUserData();
             }
             if (context.mounted) {
               Navigator.of(context).pop();

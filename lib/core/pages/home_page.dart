@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
-import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/tasks/cubit/tasks_cubit.dart';
-import 'package:taskbit/tasks/widgets/battle_display.dart';
+import 'package:taskbit/core/widgets/page_loading_indicator.dart';
+import 'package:taskbit/cubit/navigation_cubit.dart';
+import 'package:taskbit/core/cubit/user_data_cubit.dart';
+import 'package:taskbit/core/widgets/battle_display.dart';
 import 'package:taskbit/widgets/custom_header.dart';
-import 'package:taskbit/tasks/widgets/task_display.dart';
+import 'package:taskbit/core/widgets/task_display.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,13 +20,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late TasksCubit tasksCubit;
+  late UserDataCubit userDataCubit;
   late LoginCubit loginCubit;
   late NavigationCubit navigationCubit;
 
   @override
   void initState() {
-    tasksCubit = context.read<TasksCubit>();
+    userDataCubit = context.read<UserDataCubit>();
     navigationCubit = context.read<NavigationCubit>();
     loginCubit = context.read<LoginCubit>();
 
@@ -34,7 +35,7 @@ class _HomePageState extends State<HomePage> {
     if (user != null) {
       Future.delayed(
         const Duration(seconds: 1),
-        () => tasksCubit.fetchTasksEnemyData(authToken: user.accessToken),
+        () => userDataCubit.fetchUserData(),
       );
     } else {
       navigationCubit.resetState();
@@ -45,15 +46,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
+    return BlocBuilder<UserDataCubit, UserDataState>(
       builder: (context, state) {
         return AnimatedSwitcher(
           duration: const Duration(seconds: 1),
-          child: state.stage == null
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Column(
+          child: state.isLoaded
+              ? Column(
                   children: [
                     const BattleDisplay(),
                     Expanded(
@@ -64,9 +62,9 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const CustomHeader('Tasks'),
-                                _createButton(context),
+                              children: const [
+                                CustomHeader('Tasks'),
+                                _CreateTaskButton(),
                               ],
                             ),
                           ),
@@ -77,18 +75,25 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ],
-                ),
+                )
+              : const PageLoadingIndicator(),
         );
       },
     );
   }
+}
 
-  Widget _createButton(BuildContext context) {
+class _CreateTaskButton extends StatelessWidget {
+  const _CreateTaskButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final navigationCubit = BlocProvider.of<NavigationCubit>(context);
     return SizedBox(
       height: 25.0,
       child: ElevatedButton(
         onPressed: () {
-          context.read<NavigationCubit>().pageChanged(Pages.taskCreate);
+          navigationCubit.pageChanged(Pages.taskCreate);
         },
         child: Row(
           children: const [

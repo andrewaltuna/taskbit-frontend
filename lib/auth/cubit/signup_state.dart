@@ -1,9 +1,8 @@
 part of 'signup_cubit.dart';
 
 class SignupState extends Equatable {
-  SignupState({
+  const SignupState({
     this.authToken,
-    this.selectedAvatarIndex,
     this.firstName = '',
     this.lastName = '',
     this.username = '',
@@ -12,11 +11,9 @@ class SignupState extends Equatable {
     this.lastNameInputStatus = InputStatus.initial,
     this.usernameInputStatus = InputStatus.initial,
     this.passwordInputStatus = InputStatus.initial,
-    this.isProfileAvatarSelectVisible = false,
   });
 
   final String? authToken;
-  final int? selectedAvatarIndex;
   final String firstName;
   final String lastName;
   final String username;
@@ -25,13 +22,6 @@ class SignupState extends Equatable {
   final InputStatus lastNameInputStatus;
   final InputStatus usernameInputStatus;
   final InputStatus passwordInputStatus;
-  final bool isProfileAvatarSelectVisible;
-
-  final List<String> avatars = [
-    'avatars/knight',
-    'avatars/wizard',
-    'avatars/barbarian',
-  ];
 
   SignupState copyWith({
     String? authToken,
@@ -44,13 +34,9 @@ class SignupState extends Equatable {
     InputStatus? lastNameInputStatus,
     InputStatus? usernameInputStatus,
     InputStatus? passwordInputStatus,
-    bool? isProfileAvatarSelectVisible,
   }) {
     return SignupState(
       authToken: authToken ?? this.authToken,
-      selectedAvatarIndex: selectedAvatarIndex != null
-          ? selectedAvatarIndex()
-          : this.selectedAvatarIndex,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       username: username ?? this.username,
@@ -59,15 +45,12 @@ class SignupState extends Equatable {
       lastNameInputStatus: lastNameInputStatus ?? this.lastNameInputStatus,
       usernameInputStatus: usernameInputStatus ?? this.usernameInputStatus,
       passwordInputStatus: passwordInputStatus ?? this.passwordInputStatus,
-      isProfileAvatarSelectVisible:
-          isProfileAvatarSelectVisible ?? this.isProfileAvatarSelectVisible,
     );
   }
 
   @override
   List<Object?> get props => [
         authToken,
-        selectedAvatarIndex,
         firstName,
         lastName,
         username,
@@ -76,18 +59,12 @@ class SignupState extends Equatable {
         lastNameInputStatus,
         usernameInputStatus,
         passwordInputStatus,
-        isProfileAvatarSelectVisible,
       ];
 
-  bool formIsValid() {
+  bool get formIsValid {
     return firstNameInputStatus == InputStatus.valid &&
         lastNameInputStatus == InputStatus.valid &&
         usernameInputStatus == InputStatus.valid &&
-        passwordInputStatus == InputStatus.valid &&
-        selectedAvatarIndex != null;
-  }
-
-  String avatarSpriteName() {
-    return avatars[selectedAvatarIndex!].substring(8);
+        passwordInputStatus == InputStatus.valid;
   }
 }

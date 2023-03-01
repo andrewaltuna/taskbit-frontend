@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:taskbit/auth/cubit/login_cubit.dart';
-import 'package:taskbit/auth/cubit/signup_cubit.dart';
-import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/widgets/logo.dart';
+import 'package:taskbit/auth/widgets/login_form.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -14,96 +10,9 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: _LoginForm(
-        loginCubit: context.read<LoginCubit>(),
-        signupCubit: context.read<SignupCubit>(),
-        navigationCubit: context.read<NavigationCubit>(),
-      ),
-    );
-  }
-}
-
-class _LoginForm extends StatelessWidget {
-  const _LoginForm({
-    required this.loginCubit,
-    required this.signupCubit,
-    required this.navigationCubit,
-  });
-
-  final LoginCubit loginCubit;
-  final SignupCubit signupCubit;
-  final NavigationCubit navigationCubit;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<LoginCubit, LoginState>(
-      builder: (context, state) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Logo(),
-            const SizedBox(height: 30.0),
-            _usernameField(),
-            _passwordField(),
-            const SizedBox(height: 30.0),
-            _submitButton(context),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('No account yet?'),
-                TextButton(
-                  onPressed: () => navigationCubit.pageChanged(Pages.signUp),
-                  child: const Text('Sign Up'),
-                ),
-              ],
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _usernameField() {
-    return TextField(
-      onChanged: loginCubit.usernameChanged,
-      decoration: InputDecoration(
-        label: const Text('Username'),
-        errorText: loginCubit.state.usernameInputStatus == InputStatus.invalid
-            ? 'Invalid username'
-            : null,
-      ),
-    );
-  }
-
-  Widget _passwordField() {
-    return TextField(
-      onChanged: loginCubit.passwordChanged,
-      obscureText: true,
-      decoration: InputDecoration(
-        label: const Text('Password'),
-        errorText: loginCubit.state.passwordInputStatus == InputStatus.invalid
-            ? 'Invalid password'
-            : null,
-      ),
-    );
-  }
-
-  Widget _submitButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: !loginCubit.state.formIsValid()
-            ? null
-            : () async {
-                if (await loginCubit.fetchUser() == true) {
-                  signupCubit.userLoggedIn(loginCubit.state.user!.accessToken);
-                  navigationCubit.pageDeselected();
-                }
-              },
-        child: const Text('Login'),
-      ),
+    return const Padding(
+      padding: EdgeInsets.all(20.0),
+      child: LoginForm(),
     );
   }
 }

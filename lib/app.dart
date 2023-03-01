@@ -2,12 +2,12 @@ import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/pages/login_page.dart';
-import 'package:taskbit/auth/pages/profile_page.dart';
+import 'package:taskbit/core/pages/profile_page.dart';
 import 'package:taskbit/auth/pages/signup_page.dart';
 import 'package:taskbit/constants.dart';
-import 'package:taskbit/navigation/cubit/navigation_cubit.dart';
-import 'package:taskbit/tasks/cubit/task_create_cubit.dart';
-import 'package:taskbit/tasks/pages/home_page.dart';
+import 'package:taskbit/cubit/navigation_cubit.dart';
+import 'package:taskbit/tasks/cubit/task_cubit.dart';
+import 'package:taskbit/core/pages/home_page.dart';
 import 'package:taskbit/tasks/pages/task_create_page.dart';
 import 'package:taskbit/widgets/logo.dart';
 
@@ -31,7 +31,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigationCubit = context.read<NavigationCubit>();
-    final taskCreateCubit = context.read<TaskCreateCubit>();
+    final taskCubit = context.read<TaskCubit>();
     return MaterialApp(
       title: appName,
       theme: ThemeData(
@@ -59,18 +59,10 @@ class App extends StatelessWidget {
                 showUnselectedLabels: false,
                 onTap: (int index) {
                   navigationCubit.navChanged(index);
-                  taskCreateCubit.resetState();
+                  taskCubit.resetState();
                 },
                 currentIndex: navigationCubit.state.navIndex,
                 items: const [
-                  // NavigationDestination(
-                  //   icon: Icon(Icons.home),
-                  //   label: 'Home',
-                  // ),
-                  // NavigationDestination(
-                  //   icon: Icon(Icons.person),
-                  //   label: 'Profile',
-                  // ),
                   BottomNavigationBarItem(
                       label: 'Home', icon: Icon(Icons.home)),
                   BottomNavigationBarItem(

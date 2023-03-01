@@ -37,7 +37,10 @@ class LoginState extends Equatable {
   List<Object?> get props =>
       [user, username, password, usernameInputStatus, passwordInputStatus];
 
-  bool formIsValid() {
+  bool get isUsernameValid => usernameInputStatus == InputStatus.valid;
+  bool get isPasswordValid => passwordInputStatus == InputStatus.valid;
+
+  bool get isFormValid {
     return usernameInputStatus == InputStatus.valid &&
         passwordInputStatus == InputStatus.valid;
   }
