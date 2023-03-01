@@ -67,4 +67,9 @@ class SignupState extends Equatable {
         usernameInputStatus == InputStatus.valid &&
         passwordInputStatus == InputStatus.valid;
   }
+
+  bool get isFirstNameInvalid => firstNameInputStatus == InputStatus.invalid;
+  bool get isLastNameInvalid => lastNameInputStatus == InputStatus.invalid;
+  bool get isUsernameInvalid => usernameInputStatus == InputStatus.invalid;
+  bool get isPasswordInvalid => passwordInputStatus == InputStatus.invalid;
 }

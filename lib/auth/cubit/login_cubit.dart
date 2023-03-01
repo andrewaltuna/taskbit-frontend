@@ -29,6 +29,11 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  void changeUserAvatar(String avatar) {
+    User user = state.user!.copyWith(avatar: avatar);
+    emit(state.copyWith(user: () => user));
+  }
+
   void resetState() {
     emit(const LoginState());
   }

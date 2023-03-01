@@ -79,9 +79,7 @@ class _PasswordField extends StatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             label: const Text('Password'),
-            errorText: state.passwordInputStatus == InputStatus.invalid
-                ? 'Invalid password'
-                : null,
+            errorText: state.isPasswordInvalid ? 'Invalid password' : null,
           ),
         );
       },
@@ -101,9 +99,7 @@ class _UsernameField extends StatelessWidget {
           onChanged: loginCubit.usernameChanged,
           decoration: InputDecoration(
             label: const Text('Username'),
-            errorText: state.usernameInputStatus == InputStatus.invalid
-                ? 'Invalid username'
-                : null,
+            errorText: state.isUsernameInvalid ? 'Invalid username' : null,
           ),
         );
       },

@@ -51,10 +51,9 @@ class _FirstNameField extends StatelessWidget {
           onChanged: signupCubit.firstNameChanged,
           decoration: InputDecoration(
             label: const Text('First name'),
-            errorText:
-                signupCubit.state.firstNameInputStatus == InputStatus.invalid
-                    ? 'Invalid first name'
-                    : null,
+            errorText: signupCubit.state.isFirstNameInvalid
+                ? 'Invalid first name'
+                : null,
           ),
         );
       },
@@ -75,10 +74,9 @@ class _LastNameField extends StatelessWidget {
           onChanged: signupCubit.lastNameChanged,
           decoration: InputDecoration(
             label: const Text('Last name'),
-            errorText:
-                signupCubit.state.lastNameInputStatus == InputStatus.invalid
-                    ? 'Invalid last name'
-                    : null,
+            errorText: signupCubit.state.isLastNameInvalid
+                ? 'Invalid last name'
+                : null,
           ),
         );
       },
@@ -100,9 +98,7 @@ class _UsernameField extends StatelessWidget {
           decoration: InputDecoration(
             label: const Text('Username'),
             errorText:
-                signupCubit.state.usernameInputStatus == InputStatus.invalid
-                    ? 'Invalid username'
-                    : null,
+                signupCubit.state.isUsernameInvalid ? 'Invalid username' : null,
           ),
         );
       },
@@ -128,9 +124,7 @@ class _PasswordField extends StatelessWidget {
           decoration: InputDecoration(
             label: const Text('Password'),
             errorText:
-                signupCubit.state.passwordInputStatus == InputStatus.invalid
-                    ? 'Invalid password'
-                    : null,
+                signupCubit.state.isPasswordInvalid ? 'Invalid password' : null,
           ),
         );
       },

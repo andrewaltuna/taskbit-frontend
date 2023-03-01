@@ -77,8 +77,10 @@ class UserDataCubit extends Cubit<UserDataState> {
   }
 
   Future<bool> updateAvatar() async {
-    final success = await userDataRepository.updateAvatar(
-        avatarSpriteName: avatarSelectCubit.state.selectedAvatar!);
+    final selectedAvatar = avatarSelectCubit.state.selectedAvatar!;
+    loginCubit.changeUserAvatar(selectedAvatar);
+    final success =
+        await userDataRepository.updateAvatar(avatarSpriteName: selectedAvatar);
 
     return success;
   }

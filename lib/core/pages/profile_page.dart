@@ -86,8 +86,7 @@ class _UpdateAvatarWidget extends StatelessWidget {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text(
-                                  'Avatar updated! Restart the app to see changes.'),
+                              content: Text('Avatar successfully updated!'),
                             ),
                           );
                         }
@@ -110,6 +109,7 @@ class _LogoutButton extends StatelessWidget {
     final userDataCubit = BlocProvider.of<UserDataCubit>(context);
     final navigationCubit = BlocProvider.of<NavigationCubit>(context);
     final loginCubit = BlocProvider.of<LoginCubit>(context);
+    final avatarSelectCubit = BlocProvider.of<AvatarSelectCubit>(context);
 
     return SizedBox(
       width: double.maxFinite,
@@ -118,6 +118,7 @@ class _LogoutButton extends StatelessWidget {
           loginCubit.resetState();
           userDataCubit.resetState();
           navigationCubit.resetState();
+          avatarSelectCubit.resetState();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color.fromARGB(255, 211, 76, 66),
@@ -135,46 +136,51 @@ class _PlayerCard extends StatelessWidget {
   const _PlayerCard();
   @override
   Widget build(BuildContext context) {
-    final loginCubit = BlocProvider.of<LoginCubit>(context);
     final userDataCubit = BlocProvider.of<UserDataCubit>(context);
     final avatarSelectCubit = BlocProvider.of<AvatarSelectCubit>(context);
-    final user = loginCubit.state.user!;
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15.0),
-            child: IntrinsicHeight(
-              child: Row(
-                children: [
-                  // Player avatar
-                  Material(
-                    child: InkWell(
-                      onTap: () {
-                        final avatarIndex = avatarSelectCubit.state.avatars
-                            .indexOf(user.avatar);
-                        // Update signupCubit to have user avatar pre-selected
-                        avatarSelectCubit.avatarSelected(avatarIndex);
-                        avatarSelectCubit.toggleProfileAvatarSelectVisibility();
-                      },
-                      child: _playerAvatar(user.avatar),
-                    ),
+
+    return BlocBuilder<LoginCubit, LoginState>(
+      builder: (context, state) {
+        final user = state.user!;
+        final avatarIndex =
+            avatarSelectCubit.state.avatars.indexOf(user.avatar);
+        return SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      // Player avatar
+                      Material(
+                        child: InkWell(
+                          onTap: () {
+                            // Update signupCubit to have user avatar pre-selected
+                            avatarSelectCubit.avatarSelected(avatarIndex);
+                            avatarSelectCubit
+                                .toggleProfileAvatarSelectVisibility();
+                          },
+                          child: _playerAvatar(user.avatar),
+                        ),
+                      ),
+                      // Player stats
+                      Expanded(
+                        child: _playerStats(
+                          user.username,
+                          userDataCubit.state.stats!,
+                        ),
+                      ),
+                    ],
                   ),
-                  // Player stats
-                  Expanded(
-                    child: _playerStats(
-                      user.username,
-                      userDataCubit.state.stats!,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
