@@ -7,10 +7,12 @@ class SignupState extends Equatable {
     this.lastName = '',
     this.username = '',
     this.password = '',
+    this.passwordConfirmation = '',
     this.firstNameInputStatus = InputStatus.initial,
     this.lastNameInputStatus = InputStatus.initial,
     this.usernameInputStatus = InputStatus.initial,
     this.passwordInputStatus = InputStatus.initial,
+    this.passwordConfirmationInputStatus = InputStatus.initial,
   });
 
   final String? authToken;
@@ -18,10 +20,12 @@ class SignupState extends Equatable {
   final String lastName;
   final String username;
   final String password;
+  final String passwordConfirmation;
   final InputStatus firstNameInputStatus;
   final InputStatus lastNameInputStatus;
   final InputStatus usernameInputStatus;
   final InputStatus passwordInputStatus;
+  final InputStatus passwordConfirmationInputStatus;
 
   SignupState copyWith({
     String? authToken,
@@ -30,10 +34,12 @@ class SignupState extends Equatable {
     String? lastName,
     String? username,
     String? password,
+    String? passwordConfirmation,
     InputStatus? firstNameInputStatus,
     InputStatus? lastNameInputStatus,
     InputStatus? usernameInputStatus,
     InputStatus? passwordInputStatus,
+    InputStatus? passwordConfirmationInputStatus,
   }) {
     return SignupState(
       authToken: authToken ?? this.authToken,
@@ -41,10 +47,13 @@ class SignupState extends Equatable {
       lastName: lastName ?? this.lastName,
       username: username ?? this.username,
       password: password ?? this.password,
+      passwordConfirmation: passwordConfirmation ?? this.passwordConfirmation,
       firstNameInputStatus: firstNameInputStatus ?? this.firstNameInputStatus,
       lastNameInputStatus: lastNameInputStatus ?? this.lastNameInputStatus,
       usernameInputStatus: usernameInputStatus ?? this.usernameInputStatus,
       passwordInputStatus: passwordInputStatus ?? this.passwordInputStatus,
+      passwordConfirmationInputStatus: passwordConfirmationInputStatus ??
+          this.passwordConfirmationInputStatus,
     );
   }
 
@@ -55,21 +64,26 @@ class SignupState extends Equatable {
         lastName,
         username,
         password,
+        passwordConfirmation,
         firstNameInputStatus,
         lastNameInputStatus,
         usernameInputStatus,
         passwordInputStatus,
+        passwordConfirmationInputStatus
       ];
 
   bool get isFormValid {
     return firstNameInputStatus == InputStatus.valid &&
         lastNameInputStatus == InputStatus.valid &&
         usernameInputStatus == InputStatus.valid &&
-        passwordInputStatus == InputStatus.valid;
+        passwordInputStatus == InputStatus.valid &&
+        passwordConfirmationInputStatus == InputStatus.valid;
   }
 
   bool get isFirstNameInvalid => firstNameInputStatus == InputStatus.invalid;
   bool get isLastNameInvalid => lastNameInputStatus == InputStatus.invalid;
   bool get isUsernameInvalid => usernameInputStatus == InputStatus.invalid;
   bool get isPasswordInvalid => passwordInputStatus == InputStatus.invalid;
+  bool get isPasswordConfirmationInvalid =>
+      passwordConfirmationInputStatus == InputStatus.invalid;
 }

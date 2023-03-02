@@ -12,6 +12,8 @@ class SignupForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController passwordController = TextEditingController();
+    TextEditingController passwordConfirmationController =
+        TextEditingController();
 
     return BlocBuilder<SignupCubit, SignupState>(
       builder: (context, state) {
@@ -29,8 +31,13 @@ class SignupForm extends StatelessWidget {
             ),
             const _UsernameField(),
             _PasswordField(controller: passwordController),
+            _PasswordConfirmationField(
+                controller: passwordConfirmationController),
             const SizedBox(height: 30.0),
-            _SignupButton(passwordController: passwordController),
+            _SignupButton(
+              passwordController: passwordController,
+              passwordConfirmationController: passwordConfirmationController,
+            ),
           ],
         );
       },
@@ -132,10 +139,41 @@ class _PasswordField extends StatelessWidget {
   }
 }
 
+class _PasswordConfirmationField extends StatelessWidget {
+  const _PasswordConfirmationField({required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final signupCubit = BlocProvider.of<SignupCubit>(context);
+
+    return BlocBuilder<SignupCubit, SignupState>(
+      builder: (context, state) {
+        return TextField(
+          controller: controller,
+          onChanged: signupCubit.passwordConfirmationChanged,
+          obscureText: true,
+          decoration: InputDecoration(
+            label: const Text('Password Confirmation'),
+            errorText: signupCubit.state.isPasswordConfirmationInvalid
+                ? 'Invalid password'
+                : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _SignupButton extends StatelessWidget {
-  const _SignupButton({required this.passwordController});
+  const _SignupButton({
+    required this.passwordController,
+    required this.passwordConfirmationController,
+  });
 
   final TextEditingController passwordController;
+  final TextEditingController passwordConfirmationController;
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +199,7 @@ class _SignupButton extends StatelessWidget {
                           return navigationCubit.pageChanged(Pages.login);
                         }
                         passwordController.clear();
+                        passwordConfirmationController.clear();
                       }
                     : null,
                 child: const Text('Sign Up'),

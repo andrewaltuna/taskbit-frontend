@@ -53,9 +53,27 @@ class SignupCubit extends Cubit<SignupState> {
     if (value.isEmpty) {
       emit(state.copyWith(
           password: value, passwordInputStatus: InputStatus.invalid));
+    } else if (value == state.passwordConfirmation) {
+      emit(state.copyWith(
+        password: value,
+        passwordInputStatus: InputStatus.valid,
+        passwordConfirmationInputStatus: InputStatus.valid,
+      ));
     } else {
       emit(state.copyWith(
           password: value, passwordInputStatus: InputStatus.valid));
+    }
+  }
+
+  void passwordConfirmationChanged(String value) {
+    if (value != state.password) {
+      emit(state.copyWith(
+          passwordConfirmation: value,
+          passwordConfirmationInputStatus: InputStatus.invalid));
+    } else {
+      emit(state.copyWith(
+          passwordConfirmation: value,
+          passwordConfirmationInputStatus: InputStatus.valid));
     }
   }
 
