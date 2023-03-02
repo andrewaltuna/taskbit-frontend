@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/core/widgets/task_pill.dart';
+import 'package:taskbit/misc/colors.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
 import 'package:taskbit/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/task_cubit.dart';
@@ -14,6 +16,7 @@ class TaskItem extends StatelessWidget with DateFormatter {
 
   @override
   Widget build(BuildContext context) {
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(15.0),
       child: Material(
@@ -27,60 +30,78 @@ class TaskItem extends StatelessWidget with DateFormatter {
                 builder: (context) => _TaskDetailDialog(task: task),
               );
             },
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: task.isCompleted() ? 20.0 : 5.0, vertical: 5.0),
+            child: IntrinsicHeight(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (!task.isCompleted()) _CompleteTaskButton(task: task),
+                  Container(
+                    height: double.infinity,
+                    width: 20,
+                    color: taskCubit.state
+                        .difficultyColorByDifficulty(task.difficulty!),
+                  ),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          task.name,
-                          maxLines: 1,
-                          style: const TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (task.dateDue != null)
-                          Text(
-                            'Due: ${formatDatePretty(task.dateDue)}',
-                            maxLines: 1,
-                            style: const TextStyle(
-                              fontSize: 10.0,
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: task.isCompleted() ? 20.0 : 5.0,
+                          vertical: 5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (!task.isCompleted())
+                            _CompleteTaskButton(task: task),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  task.name,
+                                  maxLines: 1,
+                                  style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (task.dateDue != null)
+                                  Text(
+                                    'Due: ${formatDatePretty(task.dateDue)}',
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.bold,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                      ],
+                          task.dateCompleted == null
+                              ? Row(
+                                  children: [
+                                    if (task.isLate())
+                                      const _LateTaskIndicator(),
+                                    _TaskActionsMenu(task: task),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Text(
+                                      formatDatePretty(task.dateCompleted!),
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10.0),
+                                    const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                    ),
+                                  ],
+                                ),
+                        ],
+                      ),
                     ),
                   ),
-                  task.dateCompleted == null
-                      ? Row(
-                          children: [
-                            if (task.isLate()) const _LateTaskIndicator(),
-                            _TaskActionsMenu(task: task),
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Text(
-                              formatDatePretty(task.dateCompleted!),
-                              style: const TextStyle(
-                                color: Colors.green,
-                                fontSize: 12.0,
-                              ),
-                            ),
-                            const SizedBox(width: 10.0),
-                            const Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
                 ],
               ),
             ),
@@ -156,9 +177,15 @@ class _TaskDetailDialog extends StatelessWidget with DateFormatter {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Center(
-        child: Text(
-          task.name,
-          style: const TextStyle(fontWeight: FontWeight.w700),
+        child: Column(
+          children: [
+            _TaskDifficultyIndicator(task),
+            const SizedBox(height: 5),
+            Text(
+              task.name,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ],
         ),
       ),
       content: Column(
@@ -196,21 +223,33 @@ class _TaskDetailDialog extends StatelessWidget with DateFormatter {
 }
 
 class _LateTaskIndicator extends StatelessWidget {
-  const _LateTaskIndicator({
-    super.key,
-  });
+  const _LateTaskIndicator();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-      decoration: BoxDecoration(
-          color: Colors.red, borderRadius: BorderRadius.circular(50.0)),
-      child: const Text(
-        'LATE',
-        style: TextStyle(
-            fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-      ),
+    return const TaskPill(
+      'LATE',
+      color: Colors.white,
+      backgroundColor: Colors.red,
+    );
+  }
+}
+
+class _TaskDifficultyIndicator extends StatelessWidget {
+  const _TaskDifficultyIndicator(this.task);
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    final difficulty = task.difficulty!;
+    return BlocBuilder<TaskCubit, TaskState>(
+      builder: (context, state) {
+        return TaskPill(
+          difficulty,
+          backgroundColor: state.difficultyColorByDifficulty(difficulty),
+        );
+      },
     );
   }
 }

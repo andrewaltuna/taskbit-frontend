@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
 import 'package:taskbit/cubit/avatar_select_cubit.dart';
 import 'package:taskbit/repositories/user_data_repository.dart';
-import 'package:taskbit/tasks/models/stage.dart';
-import 'package:taskbit/tasks/models/stats.dart';
+import 'package:taskbit/core/models/stage.dart';
+import 'package:taskbit/core/models/stats.dart';
 import 'package:taskbit/tasks/models/task.dart';
 
 part 'user_data_state.dart';

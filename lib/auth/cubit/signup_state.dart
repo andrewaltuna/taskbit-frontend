@@ -61,7 +61,7 @@ class SignupState extends Equatable {
         passwordInputStatus,
       ];
 
-  bool get formIsValid {
+  bool get isFormValid {
     return firstNameInputStatus == InputStatus.valid &&
         lastNameInputStatus == InputStatus.valid &&
         usernameInputStatus == InputStatus.valid &&

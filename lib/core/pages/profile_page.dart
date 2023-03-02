@@ -6,7 +6,7 @@ import 'package:taskbit/core/widgets/page_loading_indicator.dart';
 import 'package:taskbit/cubit/avatar_select_cubit.dart';
 import 'package:taskbit/cubit/navigation_cubit.dart';
 import 'package:taskbit/core/cubit/user_data_cubit.dart';
-import 'package:taskbit/tasks/models/stats.dart';
+import 'package:taskbit/core/models/stats.dart';
 import 'package:taskbit/widgets/avatar_select.dart';
 import 'package:taskbit/widgets/custom_header.dart';
 import 'package:taskbit/widgets/sprite.dart';

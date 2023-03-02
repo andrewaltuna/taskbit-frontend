@@ -46,21 +46,23 @@ const loginQuery = r"""
           """;
 
 const createTaskMutation = r"""
-            mutation($name: String!, $description: String, $dateDue: String) {
+            mutation($name: String!, $description: String, $difficulty: String, $dateDue: String) {
               createTask (taskDetails: {
                 name: $name
                 description: $description
+                difficulty: $difficulty
                 dateDue: $dateDue
               })
             }
           """;
 
 const updateTaskMutation = r"""
-            mutation($taskId: String!, $name: String!, $description: String, $dateDue: String) {
+            mutation($taskId: String!, $name: String!, $description: String, $difficulty: String, $dateDue: String) {
               updateTask (editTaskDetails: {
                 taskId: $taskId
                 name: $name
                 description: $description
+                difficulty: $difficulty
                 dateDue: $dateDue
               })
             }
@@ -89,6 +91,7 @@ const taskEnemyQuery = r"""
                 id
                 name
                 description
+                difficulty
                 dateDue
                 dateCompleted
               }

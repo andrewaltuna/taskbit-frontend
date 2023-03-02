@@ -149,7 +149,7 @@ class _SignupButton extends StatelessWidget {
             return SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: signupState.formIsValid &&
+                onPressed: signupState.isFormValid &&
                         avatarSelectState.selectedAvatar != null
                     ? () async {
                         if (await signupCubit.registerUser() == true) {

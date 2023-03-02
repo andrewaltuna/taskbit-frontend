@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/core/widgets/task_pill.dart';
+import 'package:taskbit/misc/colors.dart';
 import 'package:taskbit/mixins/date_formatter.dart';
 import 'package:taskbit/cubit/navigation_cubit.dart';
 import 'package:taskbit/tasks/cubit/task_cubit.dart';
@@ -42,10 +44,51 @@ class _TaskCreateFormState extends State<TaskCreateForm> with DateFormatter {
         const SizedBox(height: 30.0),
         _NameField(controller: nameController),
         _DescriptionField(controller: descriptionController),
-        _DateDueField(controller: dateDueController),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              flex: 2,
+              child: _DateDueField(controller: dateDueController),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              flex: 1,
+              child: _DifficultySelectField(),
+            )
+          ],
+        ),
         const SizedBox(height: 30.0),
         const _SubmitButton(),
       ],
+    );
+  }
+}
+
+class _DifficultySelectField extends StatelessWidget {
+  const _DifficultySelectField();
+
+  @override
+  Widget build(BuildContext context) {
+    final taskCubit = BlocProvider.of<TaskCubit>(context);
+    return BlocBuilder<TaskCubit, TaskState>(
+      builder: (context, state) {
+        return DropdownButtonFormField(
+            value: state.difficulty,
+            borderRadius: BorderRadius.circular(15),
+            decoration: const InputDecoration(label: Text('Difficulty')),
+            items: List.generate(3, (index) {
+              return DropdownMenuItem(
+                  value: state.difficultyByIndex(index),
+                  child: TaskPill(
+                    state.difficultyByIndex(index),
+                    backgroundColor: state.difficultyColorByIndex(index),
+                  ));
+            }),
+            onChanged: (value) {
+              taskCubit.difficultyChanged(value!);
+            });
+      },
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:taskbit/auth/cubit/login_cubit.dart';
+import 'package:taskbit/misc/colors.dart';
 import 'package:taskbit/repositories/tasks_repository.dart';
 import 'package:taskbit/tasks/models/task.dart';
 
@@ -27,6 +28,10 @@ class TaskCubit extends Cubit<TaskState> {
     emit(state.copyWith(description: () => value.isEmpty ? null : value));
   }
 
+  void difficultyChanged(String value) {
+    emit(state.copyWith(difficulty: value));
+  }
+
   void dateDueChanged(DateTime value) {
     emit(state.copyWith(dateDue: () => value));
   }
@@ -36,6 +41,7 @@ class TaskCubit extends Cubit<TaskState> {
       id: () => task.id,
       name: task.name,
       description: () => task.description,
+      difficulty: task.difficulty,
       dateDue: () => task.dateDue,
       nameInputStatus: InputStatus.valid,
     ));
@@ -49,6 +55,7 @@ class TaskCubit extends Cubit<TaskState> {
     final success = await tasksRepository.create(
       name: state.name,
       description: state.description,
+      difficulty: state.difficulty,
       dateDue: state.dateDue?.toString(),
     );
 
@@ -63,6 +70,7 @@ class TaskCubit extends Cubit<TaskState> {
       id: state.id!,
       name: state.name,
       description: state.description,
+      difficulty: state.difficulty,
       dateDue: state.dateDue?.toString(),
     );
 

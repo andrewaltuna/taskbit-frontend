@@ -7,6 +7,7 @@ class Task extends Equatable with DateFormatter {
     required this.id,
     required this.name,
     this.description,
+    required this.difficulty,
     this.dateDue,
     this.dateCompleted,
   });
@@ -14,6 +15,7 @@ class Task extends Equatable with DateFormatter {
   late final String id;
   late final String name;
   late final String? description;
+  late final String? difficulty;
   late final DateTime? dateDue;
   late final DateTime? dateCompleted;
 
@@ -21,6 +23,7 @@ class Task extends Equatable with DateFormatter {
     id = data['id'];
     name = data['name'];
     description = data['description'];
+    difficulty = data['difficulty'];
     dateDue = DateTime.tryParse(data['dateDue'] ?? '');
     dateCompleted = DateTime.tryParse(data['dateCompleted'] ?? '');
   }
@@ -60,6 +63,7 @@ class Task extends Equatable with DateFormatter {
         id,
         name,
         description,
+        difficulty,
         dateDue,
         dateCompleted,
       ];

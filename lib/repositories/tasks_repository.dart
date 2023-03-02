@@ -23,6 +23,7 @@ class TasksRepository {
   Future<bool> create({
     required String name,
     required String? description,
+    required String difficulty,
     required String? dateDue,
   }) async {
     final QueryResult result = await _gqlClient.mutate(
@@ -34,6 +35,7 @@ class TasksRepository {
         variables: {
           'name': name,
           'description': description,
+          'difficulty': difficulty,
           'dateDue': dateDue,
         },
       ),
@@ -46,6 +48,7 @@ class TasksRepository {
     required String id,
     required String name,
     required String? description,
+    required String difficulty,
     required String? dateDue,
   }) async {
     final QueryResult result = await _gqlClient.mutate(
@@ -58,6 +61,7 @@ class TasksRepository {
           'taskId': id,
           'name': name,
           'description': description,
+          'difficulty': difficulty,
           'dateDue': dateDue,
         },
       ),
