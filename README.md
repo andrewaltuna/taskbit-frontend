@@ -1,4 +1,4 @@
-# taskbit
+# taskbit!
 
 taskbit! is a gamified to-do list app built with **Flutter** aimed at keeping users motivated and productive. With a focus on user engagement, it incorporates elements typically found in games into task management.
 
