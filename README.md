@@ -19,17 +19,17 @@ TaskBit incorporates basic sign-up, login, and logout functionalities to ensure 
 ### Dashboard and Minigame Display
 Easily track ongoing and completed tasks via the task list. Dive into the minigame display, featuring stage progression, user avatar, and dynamic enemy encounters. Each stage contains 3 regular enemies and 1 boss enemy.
 
-![](https://media2.giphy.com/media/HB4S4oFaccJmSnL4FV/giphy.webp)
+![](https://media2.giphy.com/media/HB4S4oFaccJmSnL4FV/giphy.gif)
 
 ### Creating and Viewing Tasks
 Create tasks with customizable titles, descriptions, due dates, and difficulties. Display a task's information by simply selecting it.
 
-![](https://media4.giphy.com/media/565RrwCQpl7GJtAzNX/giphy.webp)
+![](https://media4.giphy.com/media/565RrwCQpl7GJtAzNX/giphy.gif)
 
 ### Updating and Deleting Tasks
 Update and delete tasks with a few simple clicks via the task dropdown menu.
 
-![](https://media3.giphy.com/media/yUhuWOPFojBSYS23ev/giphy.webp)
+![](https://media3.giphy.com/media/yUhuWOPFojBSYS23ev/giphy.gif)
  
 ### Completing Tasks
 Complete tasks to attack the current stage enemy, decreasing its hit-points depending on how difficult your task was. Defeat enemies to progress to the next substage (if the enemy is a basic enemy) or the next stage (if the enemy is a boss)!
@@ -39,4 +39,4 @@ Complete tasks to attack the current stage enemy, decreasing its hit-points depe
 ### User Profile and Logout
 Explore your profile for an overview of your journey, featuring lifetime statistics such as enemies slain, bosses defeated, tasks completed, and stages cleared. Want a new look? Easily switch up your player avatar by selecting your profile card.
 
-![](https://media2.giphy.com/media/vObeHod6H4k1xMshwU/giphy.webp)
+![](https://media2.giphy.com/media/vObeHod6H4k1xMshwU/giphy.gif)
